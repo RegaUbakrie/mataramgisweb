@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"MultiPoint","coordinates":[]},"id":"0","properties":{"Accuracy":0.9848484848484849,"F1":0.9857819905213271,"FN":1,"FP":2,"Kappa":0.9695665539501999,"Precision":0.9811320754716981,"Recall":0.9904761904761905,"TN":91,"TP":104}}]}

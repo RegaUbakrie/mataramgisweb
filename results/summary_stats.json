@@ -1,0 +1,27 @@
+{
+  "city_area_ha": 6016.83,
+  "target_2024_ha": 2580.85,
+  "target_2025_ha": 2527.71,
+  "pct_2024": 42.89,
+  "pct_2025": 42.01,
+  "gain_ha": 135.96,
+  "loss_ha": 189.1,
+  "net_change_ha": -53.14,
+  "pct_change_vs_2024": -2.06,
+  "confusion_matrix": {
+    "TN": 91,
+    "FP": 2,
+    "FN": 1,
+    "TP": 104,
+    "accuracy": 0.9848484848484849,
+    "precision": 0.9811320754716981,
+    "recall": 0.9904761904761905,
+    "f1": 0.9857819905213271,
+    "kappa": 0.9695665539501999
+  },
+  "ground_truth_total": 640,
+  "training_total": 380,
+  "testing_total": 260,
+  "testing_used_in_cm": 198,
+  "mmu_ha": 0.2
+}

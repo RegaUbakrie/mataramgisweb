@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perubahan Vegetasi Kota Mataram 2024–2025 · WebGIS</title>
+<script>try{if(localStorage.getItem('mataram-ui-theme')==='apple'){document.documentElement.setAttribute('data-theme','apple');}}catch(e){}</script>
+<link rel="stylesheet" href="assets/leaflet.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6;
+    --panel:#E4E2D4;
+    --panel-2:#DAD8C8;
+    --ink:#1E2A22;
+    --ink-soft:#4A5A4E;
+    --line: rgba(30,42,34,0.14);
+    --veg:#2F6B4F;
+    --veg-2:#1D4636;
+    --loss:#A8452E;
+    --gain:#C99A3D;
+    --nonveg:#B9B6A4;
+    --demo:#B5772E;
+    --real:#2F6B4F;
+    --white:#FBFAF6;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;}
+  ::selection{background:var(--veg);color:var(--white);}
+
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:600;margin:0;letter-spacing:-0.01em;}
+
+  /* ---------- HEADER ---------- */
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding:22px clamp(16px,4vw,48px) 16px;
+    display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;
+    background:linear-gradient(180deg, var(--paper) 0%, var(--paper) 100%);
+  }
+  .brand-eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--veg-2);margin-bottom:6px;display:flex;align-items:center;gap:8px;
+  }
+  .brand-eyebrow .dot{width:6px;height:6px;background:var(--veg);border-radius:50%;display:inline-block;}
+  header.top h1{font-size:clamp(22px,3.4vw,34px);line-height:1.05;max-width:680px;}
+  header.top h1 em{font-style:normal;color:var(--veg-2);border-bottom:2px solid var(--gain);}
+  .brand-block{display:flex;align-items:center;gap:16px;}
+  .brand-logo{height:64px;width:auto;flex:none;}
+  @media (max-width:560px){.brand-logo{height:48px;}}
+  .team{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);text-align:right;line-height:1.7;}
+  .team .k{color:var(--ink);font-weight:600;}
+
+  /* ---------- DEMO BANNER ---------- */
+  .banner{
+    background:#F4E6D2;border-top:1px solid #D9BE8E;border-bottom:1px solid #D9BE8E;
+    padding:10px clamp(16px,4vw,48px);font-size:12.5px;color:#5C3E17;display:flex;gap:10px;align-items:flex-start;
+  }
+  .banner b{color:#8A5A19;}
+  .banner .tag{
+    flex:none;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.08em;
+    background:var(--demo);color:#fff;padding:2px 7px;border-radius:2px;margin-top:1px;
+  }
+
+  /* ---------- TAB STRIP (signature element: band-selector chips) ---------- */
+  nav.bands{
+    display:flex;gap:2px;padding:14px clamp(16px,4vw,48px) 0;background:var(--paper);
+    border-bottom:1px solid var(--line);overflow-x:auto;
+  }
+  .band-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:0.03em;
+    background:var(--panel);border:1px solid var(--line);border-bottom:none;
+    padding:10px 16px 12px;cursor:pointer;color:var(--ink-soft);white-space:nowrap;
+    display:flex;align-items:center;gap:8px;position:relative;top:1px;
+    transition:background .15s, color .15s;
+  }
+  .band-btn .num{color:var(--ink-soft);opacity:.6;}
+  .band-btn .status{width:6px;height:6px;border-radius:50%;flex:none;}
+  .band-btn .status.real{background:var(--real);}
+  .band-btn .status.demo{background:var(--demo);}
+  .band-btn:hover{background:var(--panel-2);color:var(--ink);}
+  .band-btn.active{background:var(--paper);color:var(--ink);border-bottom:1px solid var(--paper);font-weight:600;}
+  .band-btn.active .num{color:var(--veg-2);opacity:1;}
+
+  main{padding:28px clamp(16px,4vw,48px) 60px;max-width:1320px;margin:0 auto;}
+  .tabpanel{display:none;animation:fade .25s ease;}
+  .tabpanel.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  .section-label{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--veg-2);margin-bottom:6px;
+  }
+  .tabpanel h2{font-size:clamp(20px,2.6vw,28px);margin-bottom:18px;}
+
+  /* stat cards */
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:22px;}
+  .stat-card{background:var(--white);padding:16px 16px 14px;}
+  .stat-card .v{font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:var(--veg-2);}
+  .stat-card .v.loss-v{color:var(--loss);}
+  .stat-card .l{font-size:11px;color:var(--ink-soft);margin-top:2px;text-transform:uppercase;letter-spacing:.04em;}
+
+  /* ---------- TAB 1: MAP ---------- */
+  .map-layout{display:grid;grid-template-columns:260px 1fr;gap:16px;}
+  @media (max-width:820px){.map-layout{grid-template-columns:1fr;}}
+  #map{height:600px;border:1px solid var(--line);background:#e9e8e0;}
+  .legend-panel{background:var(--white);border:1px solid var(--line);padding:16px;font-size:13px;height:fit-content;}
+  .legend-panel h4{font-size:13px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);}
+  .legend-item{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid var(--line);cursor:pointer;user-select:none;}
+  .legend-item:last-child{border-bottom:none;}
+  .legend-swatch{width:15px;height:15px;flex:none;border-radius:2px;border:1px solid rgba(0,0,0,.15);}
+  .legend-item input{margin-left:auto;}
+  .basemap-toggle{display:flex;gap:6px;margin-top:14px;}
+  .basemap-toggle button{flex:1;font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:7px 4px;background:var(--panel);border:1px solid var(--line);cursor:pointer;color:var(--ink-soft);}
+  .basemap-toggle button.active{background:var(--veg-2);color:#fff;border-color:var(--veg-2);}
+
+  /* ---------- TAB 2: DATA & PROSES ---------- */
+  .flow{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin:24px 0 36px;background:var(--white);border:1px solid var(--line);padding:26px 20px;overflow-x:auto;}
+  .flow-step{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;text-align:center;padding:10px 12px;
+    background:var(--panel);border:1px solid var(--line);min-width:108px;color:var(--ink);flex:none;
+  }
+  .flow-arrow{color:var(--ink-soft);padding:0 8px;flex:none;font-size:14px;}
+
+  table.spec{width:100%;border-collapse:collapse;background:var(--white);font-size:13.5px;margin-bottom:28px;}
+  table.spec th, table.spec td{border:1px solid var(--line);padding:9px 12px;text-align:left;}
+  table.spec th{background:var(--panel);font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);font-weight:600;}
+  table.spec td.mono{font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  @media (max-width:760px){.two-col{grid-template-columns:1fr;}}
+
+  /* ---------- TAB 2: DOWNLOAD DATA ---------- */
+  .download-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:14px;}
+  .download-card{background:var(--paper);border:1px solid var(--line);padding:14px 16px;display:flex;flex-direction:column;gap:8px;}
+  .download-card .dc-name{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--veg-2);word-break:break-all;}
+  .download-card .dc-desc{font-size:12px;color:var(--ink-soft);line-height:1.5;flex:1;}
+  .download-card .dc-meta{font-size:10px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.04em;}
+  .download-btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;text-decoration:none;
+    background:var(--veg-2);color:#fff;padding:8px 12px;border:1px solid var(--veg-2);cursor:pointer;transition:background .15s;
+  }
+  .download-btn:hover{background:#153629;}
+
+  .card{background:var(--white);border:1px solid var(--line);padding:18px 20px;}
+  .card h4{font-size:14px;font-family:'IBM Plex Sans',sans-serif;font-weight:600;margin-bottom:10px;}
+  .card ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.7;color:var(--ink-soft);}
+
+  /* flow step clickable */
+  .flow-step.clickable{cursor:pointer;transition:background .15s,border-color .15s,color .15s;}
+  .flow-step.clickable:hover{background:var(--panel-2);}
+  .flow-step.clickable.selected{background:var(--veg-2);color:#fff;border-color:var(--veg-2);}
+
+  /* code viewer */
+  .code-panel-wrap{background:#1E2620;border:1px solid var(--line);margin-bottom:32px;overflow:hidden;}
+  .code-panel-header{
+    display:flex;justify-content:space-between;align-items:center;
+    background:#152019;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .code-panel-header span{font-size:11.5px;color:#9FB3A6;}
+  .code-reset-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;background:transparent;color:#9FB3A6;
+    border:1px solid rgba(255,255,255,0.18);padding:4px 10px;cursor:pointer;
+  }
+  .code-reset-btn:hover{color:#fff;border-color:#fff;}
+  .code-viewer{
+    max-height:480px;overflow-y:auto;overflow-x:auto;font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;line-height:1.65;background:#1E2620;
+  }
+  .code-loading{padding:20px;color:#9FB3A6;}
+  .codeline{display:flex;white-space:pre;padding:0 16px;transition:background .2s, opacity .2s;opacity:0.38;}
+  .codeline .ln{
+    flex:none;width:44px;text-align:right;margin-right:16px;color:#5A6B60;user-select:none;
+  }
+  .codeline .code-text{color:#DCE3DA;}
+  .codeline.in-range{opacity:1;}
+  .codeline.in-range.range-start{border-top:1px solid #C99A3D;}
+  .codeline.in-range.range-end{border-bottom:1px solid #C99A3D;}
+  .codeline.in-range{background:rgba(201,154,61,0.08);}
+  .tok-comment{color:#6E8A76;}
+  .tok-string{color:#C99A3D;}
+  .tok-keyword{color:#8BB89A;}
+  .tok-func{color:#7FB0C9;}
+  .tok-number{color:#D08770;}
+
+  /* ---------- TAB 3: EVALUASI ---------- */
+  .cm-wrap{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start;margin-bottom:24px;}
+  table.cm{border-collapse:collapse;background:var(--white);}
+  table.cm th, table.cm td{border:1px solid var(--line);padding:14px 20px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:14px;}
+  table.cm th{background:var(--panel);font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
+  table.cm td.tp{background:rgba(47,107,79,0.16);font-weight:600;}
+  table.cm td.tn{background:rgba(47,107,79,0.10);font-weight:600;}
+  table.cm td.fp, table.cm td.fn{background:rgba(168,69,46,0.10);}
+  .aprf-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);flex:1;min-width:280px;}
+  .aprf-card{background:var(--white);padding:16px;text-align:center;}
+  .aprf-card .v{font-family:'Fraunces',serif;font-size:28px;font-weight:600;color:var(--veg-2);}
+  .aprf-card .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin-top:4px;}
+
+  /* ---------- TAB 4: INSIGHT ---------- */
+  .bar-chart{background:var(--white);border:1px solid var(--line);padding:20px 22px;margin-bottom:24px;}
+  .bar-row{display:grid;grid-template-columns:120px 1fr 60px;align-items:center;gap:10px;padding:7px 0;font-size:12.5px;}
+  .bar-track{background:var(--panel);height:16px;position:relative;}
+  .bar-fill{height:100%;background:var(--loss);}
+  .bar-row .val{font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--ink-soft);}
+
+  /* ---------- TAB 1: YEAR COMPARE CHART (interactive) ---------- */
+  .year-chart{background:var(--white);border:1px solid var(--line);padding:18px 20px;margin-bottom:20px;}
+  .year-bar-row{display:grid;grid-template-columns:70px 1fr 70px;align-items:center;gap:12px;padding:9px 4px;cursor:pointer;border-radius:2px;transition:background .15s,opacity .15s;}
+  .year-bar-row:hover{background:var(--panel);}
+  .year-bar-row.off{opacity:.4;}
+  .year-bar-row.off .year-bar-track{filter:grayscale(0.6);}
+  .year-bar-row .yb-label{font-size:13px;font-weight:700;font-family:'IBM Plex Mono',monospace;}
+  .year-bar-track{background:var(--panel);height:22px;position:relative;border:1px solid var(--line);}
+  .year-bar-fill{height:100%;transition:width .5s ease;}
+  .year-bar-row .yb-val{font-family:'IBM Plex Mono',monospace;text-align:right;font-size:13px;color:var(--ink-soft);}
+  .chart-hint{font-size:11px;color:var(--ink-soft);margin-top:6px;}
+  .chart-tooltip{position:fixed;background:var(--ink);color:#fff;padding:8px 11px;font-size:11.5px;line-height:1.55;border-radius:2px;pointer-events:none;z-index:9999;max-width:240px;display:none;box-shadow:0 4px 14px rgba(0,0,0,.3);font-family:'IBM Plex Sans',sans-serif;}
+
+  /* ---------- TAB 1: PRIORITY ACTION (map badges + panel) ---------- */
+  .priority-marker{
+    width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12px;color:#fff;
+    border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.4);
+  }
+  .priority-panel{background:var(--white);border:1px solid var(--line);padding:20px 22px;margin-top:20px;}
+  .priority-row{
+    display:grid;grid-template-columns:34px 150px 1fr 70px;gap:14px;align-items:center;
+    padding:11px 6px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s;
+  }
+  .priority-row:last-child{border-bottom:none;}
+  .priority-row:hover{background:var(--panel);}
+  .priority-rank{
+    width:28px;height:28px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;flex:none;
+  }
+  .priority-name{font-weight:600;font-size:13.5px;}
+  .priority-tier{
+    font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;
+    padding:3px 7px;border-radius:2px;display:inline-block;width:fit-content;margin-top:3px;
+  }
+  .priority-action{font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
+  .priority-pct{font-family:'IBM Plex Mono',monospace;text-align:right;font-size:13.5px;font-weight:600;}
+
+  /* ---------- TAB 4: ADVANCED STATISTICAL ANALYSIS ---------- */
+  .stat-analysis-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px;margin-top:16px;}
+  .stat-panel{background:var(--white);border:1px solid var(--line);padding:18px 20px;}
+  .stat-panel h4{font-size:14px;margin-bottom:8px;}
+  .stat-panel .formula{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--panel);padding:9px 11px;
+    border-left:3px solid var(--veg-2);color:var(--ink-soft);margin:0 0 12px;overflow-x:auto;white-space:nowrap;
+  }
+  .stat-note{font-size:12px;color:var(--ink-soft);line-height:1.6;margin:10px 0 0;}
+  .stat-mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(85px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);}
+  .stat-mini-card{background:var(--white);padding:10px 6px;text-align:center;}
+  .stat-mini-card .v{font-family:'Fraunces',serif;font-size:17px;font-weight:600;color:var(--veg-2);}
+  .stat-mini-card .l{font-size:9px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;margin-top:3px;line-height:1.3;}
+  .stat-verdict{font-size:12px;padding:9px 11px;border-left:3px solid var(--veg);background:rgba(47,107,79,.08);margin-top:10px;line-height:1.55;}
+  .stat-verdict.warn{border-color:var(--loss);background:rgba(168,69,46,.08);}
+
+  .ci-track{position:relative;height:36px;background:var(--panel);border:1px solid var(--line);margin-top:4px;}
+  .ci-range{position:absolute;top:0;height:100%;background:rgba(47,107,79,.28);border-left:2px solid var(--veg-2);border-right:2px solid var(--veg-2);}
+  .ci-point{position:absolute;top:0;width:2px;height:100%;background:var(--ink);}
+  .ci-scale{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-soft);margin-top:5px;}
+
+  .mcnemar-bars{display:flex;gap:16px;align-items:flex-end;height:80px;margin-top:6px;}
+  .mcnemar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
+  .mcnemar-bar{width:60%;background:var(--loss);transition:height .4s ease;}
+  .mcnemar-col .mn-val{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;margin-bottom:4px;}
+  .mcnemar-col .mn-label{font-size:10.5px;color:var(--ink-soft);margin-top:6px;text-transform:uppercase;letter-spacing:.03em;}
+
+  .swap-bar{display:flex;height:36px;border:1px solid var(--line);overflow:hidden;margin-top:4px;}
+  .swap-seg{display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#fff;white-space:nowrap;overflow:hidden;padding:0 4px;}
+
+  .z-row{display:grid;grid-template-columns:120px 1fr 64px;align-items:center;gap:10px;padding:7px 0;font-size:12.5px;}
+  .z-track{position:relative;height:18px;background:var(--panel);}
+  .z-center-line{position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:var(--ink-soft);}
+  .z-fill{position:absolute;top:0;height:100%;}
+  .z-row .z-val{font-family:'IBM Plex Mono',monospace;text-align:right;font-size:12.5px;font-weight:600;}
+
+  .insight-quote{
+    border-left:3px solid var(--gain);padding:4px 0 4px 18px;font-family:'Fraunces',serif;font-size:17px;
+    font-style:italic;color:var(--veg-2);margin:20px 0;line-height:1.5;
+  }
+
+  footer{border-top:1px solid var(--line);padding:22px clamp(16px,4vw,48px);font-size:11.5px;color:var(--ink-soft);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-family:'IBM Plex Mono',monospace;}
+
+  .leaflet-popup-content{font-family:'IBM Plex Sans',sans-serif;font-size:13px;}
+  .leaflet-popup-content b{font-family:'IBM Plex Mono',monospace;}
+
+  /* ================= THEME SWITCHER (chrome, same in both themes) ================= */
+  .theme-switch{
+    position:fixed;top:14px;right:16px;z-index:2000;display:flex;gap:2px;
+    background:rgba(255,255,255,0.75);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(0,0,0,.08);border-radius:999px;padding:3px;box-shadow:0 2px 12px rgba(0,0,0,.14);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  .theme-switch .ts-opt{
+    border:none;background:transparent;padding:7px 15px;font-size:11.5px;font-weight:600;letter-spacing:.02em;
+    border-radius:999px;cursor:pointer;color:#4A5A4E;transition:background .2s ease,color .2s ease;
+  }
+  .theme-switch .ts-opt.active{background:#1D1D1F;color:#fff;}
+  .theme-switch .ts-opt:hover:not(.active){background:rgba(0,0,0,.06);}
+  @media (max-width:640px){.theme-switch{top:auto;bottom:14px;right:14px;}}
+
+  /* ================================================================
+     APPLE-STYLE CLEAN THEME — toggle via data-theme="apple" on <html>
+     ================================================================ */
+  html[data-theme="apple"]{
+    --paper:#F5F5F7; --panel:#FFFFFF; --panel-2:#F0F0F2;
+    --ink:#1D1D1F; --ink-soft:#6E6E73; --line:rgba(0,0,0,0.08);
+    --veg:#30B75A; --veg-2:#0071E3; --loss:#FF3B30; --gain:#FF9F0A;
+    --nonveg:#C7C7CC; --demo:#FF9F0A; --real:#30B75A; --white:#FFFFFF;
+  }
+  html[data-theme="apple"] body,
+  html[data-theme="apple"] h1, html[data-theme="apple"] h2,
+  html[data-theme="apple"] h3, html[data-theme="apple"] h4,
+  html[data-theme="apple"] .mono, html[data-theme="apple"] .code-viewer,
+  html[data-theme="apple"] table.spec td.mono, html[data-theme="apple"] .brand-eyebrow,
+  html[data-theme="apple"] .team, html[data-theme="apple"] footer,
+  html[data-theme="apple"] .band-btn, html[data-theme="apple"] .insight-quote,
+  html[data-theme="apple"] .formula, html[data-theme="apple"] .year-bar-row .yb-label,
+  html[data-theme="apple"] .priority-rank, html[data-theme="apple"] .z-val{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Helvetica,Arial,sans-serif !important;
+  }
+  html[data-theme="apple"] h1,html[data-theme="apple"] h2,html[data-theme="apple"] h3,html[data-theme="apple"] h4{
+    font-weight:700;letter-spacing:-0.02em;
+  }
+  html[data-theme="apple"] header.top h1 em{border-bottom:none;color:var(--veg-2);font-style:normal;}
+  html[data-theme="apple"] .insight-quote{font-style:normal;font-weight:500;font-size:18px;border-left-color:var(--veg-2);}
+  html[data-theme="apple"] ::selection{background:var(--veg-2);color:#fff;}
+
+  /* card-like surfaces: flat border -> soft shadow + generous radius */
+  html[data-theme="apple"] .card,
+  html[data-theme="apple"] .stat-card,
+  html[data-theme="apple"] .legend-panel,
+  html[data-theme="apple"] .bar-chart,
+  html[data-theme="apple"] .year-chart,
+  html[data-theme="apple"] .priority-panel,
+  html[data-theme="apple"] .stat-panel,
+  html[data-theme="apple"] .download-card,
+  html[data-theme="apple"] .aprf-card,
+  html[data-theme="apple"] .cm-wrap table.cm,
+  html[data-theme="apple"] table.spec,
+  html[data-theme="apple"] .code-panel-wrap,
+  html[data-theme="apple"] .flow-step,
+  html[data-theme="apple"] #map,
+  html[data-theme="apple"] .stat-mini-card{
+    border:none !important;
+    border-radius:18px !important;
+    box-shadow:0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.06) !important;
+  }
+  html[data-theme="apple"] .flow-step{box-shadow:0 1px 2px rgba(0,0,0,.05) !important;}
+  html[data-theme="apple"] .flow-step.clickable:hover{box-shadow:0 4px 14px rgba(0,0,0,.12) !important;}
+  html[data-theme="apple"] .flow-step.clickable.selected{box-shadow:0 4px 14px rgba(0,113,227,.35) !important;}
+  html[data-theme="apple"] .download-card{border-color:transparent !important;}
+  html[data-theme="apple"] table.spec th, html[data-theme="apple"] table.spec td,
+  html[data-theme="apple"] table.cm th, html[data-theme="apple"] table.cm td{border-color:var(--line) !important;}
+
+  /* grouped rows (grid-gap-as-divider trick): let gaps go transparent for seamless grouped look */
+  html[data-theme="apple"] .stats-row,
+  html[data-theme="apple"] .aprf-grid,
+  html[data-theme="apple"] .download-grid,
+  html[data-theme="apple"] .stat-analysis-grid,
+  html[data-theme="apple"] .stat-mini-grid{
+    background:transparent !important;border:none !important;gap:10px !important;
+  }
+
+  /* header */
+  html[data-theme="apple"] header.top{border-bottom:none;padding-top:28px;}
+  html[data-theme="apple"] .brand-eyebrow{color:var(--veg-2);}
+  html[data-theme="apple"] .brand-eyebrow .dot{background:var(--veg-2);}
+
+  /* nav tabs -> segmented control */
+  html[data-theme="apple"] nav.bands{
+    border-bottom:none;background:var(--panel-2);display:inline-flex;gap:2px;
+    padding:4px;border-radius:14px;margin:0 clamp(16px,4vw,48px) 18px;width:fit-content;overflow:visible;
+  }
+  html[data-theme="apple"] .band-btn{
+    border:none;background:transparent;top:0;border-radius:10px;padding:9px 16px;box-shadow:none;
+  }
+  html[data-theme="apple"] .band-btn:hover{background:rgba(0,0,0,.04);}
+  html[data-theme="apple"] .band-btn.active{
+    background:var(--white);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.14);font-weight:600;
+  }
+  html[data-theme="apple"] .band-btn.active .num{color:var(--veg-2);}
+
+  /* buttons */
+  html[data-theme="apple"] .download-btn,
+  html[data-theme="apple"] .basemap-toggle button,
+  html[data-theme="apple"] .code-reset-btn,
+  html[data-theme="apple"] #btn-light, html[data-theme="apple"] #btn-sat{
+    border-radius:10px !important;border:none !important;font-weight:600;
+  }
+  html[data-theme="apple"] .download-btn{background:var(--veg-2) !important;border-color:var(--veg-2) !important;}
+  html[data-theme="apple"] .download-btn:hover{background:#0059B3 !important;}
+  html[data-theme="apple"] .basemap-toggle button{background:var(--panel-2);color:var(--ink-soft);}
+  html[data-theme="apple"] .basemap-toggle button.active{background:var(--veg-2) !important;border-color:var(--veg-2) !important;}
+  html[data-theme="apple"] .code-reset-btn{border:1px solid rgba(255,255,255,.18) !important;}
+
+  /* legend + priority rows: no hairlines, subtle hover */
+  html[data-theme="apple"] .legend-item{border-bottom:none;border-radius:10px;padding:8px 8px;}
+  html[data-theme="apple"] .legend-item:hover{background:var(--panel-2);}
+  html[data-theme="apple"] .priority-row{border-bottom:none;border-radius:12px;margin-bottom:2px;}
+  html[data-theme="apple"] .priority-row:hover{background:var(--panel-2);}
+
+  html[data-theme="apple"] .leaflet-control-zoom a{border-radius:8px !important;}
+  html[data-theme="apple"] .leaflet-control-zoom{border-radius:10px !important;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.14) !important;}
+
+  footer, .card, .stat-card{transition:box-shadow .25s ease, border-radius .25s ease, background .25s ease;}
+</style>
+</head>
+<body>
+
+<div class="theme-switch" id="themeSwitch" role="tablist" aria-label="Tema tampilan">
+  <button type="button" class="ts-opt" data-theme-value="default">Editorial</button>
+  <button type="button" class="ts-opt" data-theme-value="apple">Clean</button>
+</div>
+
+<header class="top">
+  <div class="brand-block">
+    <img src="assets/logo-mataram.png" alt="Lambang Kota Mataram" class="brand-logo">
+    <div>
+      <div class="brand-eyebrow"><span class="dot"></span>KAPITA SELEKTA SISTEM INFORMASI &middot; MAHA DATA</div>
+      <h1>Pemetaan Perubahan <em>Vegetasi</em> Kota Mataram</h1>
+    </div>
+  </div>
+  <div class="team">
+    Nabila &middot; Adrian &middot; Femas &middot; Abi &middot; <span class="k">Rega</span><br>
+    Sentinel-2 &middot; Random Forest &middot; WebGIS 4-Tab<br>
+    Periode 2024&ndash;2025
+  </div>
+</header>
+
+<nav class="bands">
+  <button class="band-btn active" data-tab="1"><span class="num">01</span> PETA HASIL <span class="status real"></span></button>
+  <button class="band-btn" data-tab="2"><span class="num">02</span> DATA &amp; PROSES <span class="status real"></span></button>
+  <button class="band-btn" data-tab="3"><span class="num">03</span> EVALUASI MODEL <span class="status real"></span></button>
+  <button class="band-btn" data-tab="4"><span class="num">04</span> INSIGHT HASIL <span class="status real"></span></button>
+</nav>
+
+<main>
+
+  <!-- ============ TAB 1: PETA HASIL ============ -->
+  <section class="tabpanel active" id="tab-1">
+    <div class="section-label">Instruksi 4 &middot; Tab 1</div>
+    <h2>Peta Hasil &mdash; Kota Mataram, Objek Target: Vegetasi</h2>
+
+    <div class="insight-quote">
+      &ldquo;Dalam satu tahun, Kota Mataram kehilangan lebih banyak vegetasi (202,35 ha) daripada yang berhasil
+      ditambahkan (139,66 ha) &mdash; net <b>&minus;62,69 ha (&minus;2,33%)</b>. <b>Sekarbela</b> jadi titik loss
+      tertinggi (&plusmn;33 ha), sementara <b>Selaparang</b> justru mencatat gain tertinggi (&plusmn;31 ha).
+      Model klasifikasi mendukung temuan ini dengan akurasi 97,1% (Kappa 0,942) &mdash; lihat Tab 03 &amp; 04
+      untuk evaluasi lengkap dan interpretasinya.&rdquo;
+    </div>
+
+    <div class="year-chart">
+      <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);margin-bottom:2px;">Luas Vegetasi &mdash; 2024 vs 2025</h4>
+      <div id="yearBars"><!-- filled by JS --></div>
+      <div class="chart-hint">Klik salah satu bar untuk tampilkan/sembunyikan layer-nya di peta &middot; arahkan kursor ke bar untuk lihat detail.</div>
+    </div>
+
+    <div class="stats-row" id="statsRow"><!-- filled by JS --></div>
+
+    <div class="map-layout">
+      <div class="legend-panel">
+        <h4>Layer</h4>
+        <div class="legend-item" data-layer="batas"><span class="legend-swatch" style="background:none;border:2px solid #A8452E;"></span> Batas Kota Mataram <input type="checkbox" checked></div>
+        <div class="legend-item" data-layer="priority"><span class="legend-swatch" style="background:linear-gradient(135deg,#A8452E,#C99A3D,#2F6B4F);border-radius:50%;"></span> Prioritas Tindakan (rank 1&ndash;6) <input type="checkbox" checked></div>
+        <div class="legend-item" data-layer="kecamatan"><span class="legend-swatch" style="background:linear-gradient(90deg,#2F6B4F 50%,#A8452E 50%);border:1px dashed #4A5A4E;"></span> Kecamatan (bertambah/berkurang) <input type="checkbox"></div>
+        <div class="legend-item" data-layer="t24"><span class="legend-swatch" style="background:#4A90C4;"></span> Target Vegetasi 2024 <input type="checkbox" checked></div>
+        <div class="legend-item" data-layer="t25"><span class="legend-swatch" style="background:#2F6B4F;"></span> Target Vegetasi 2025 <input type="checkbox"></div>
+        <div class="legend-item" data-layer="gain"><span class="legend-swatch" style="background:#C99A3D;"></span> Gain (0&rarr;1) <input type="checkbox" checked></div>
+        <div class="legend-item" data-layer="loss"><span class="legend-swatch" style="background:#A8452E;"></span> Loss (1&rarr;0) <input type="checkbox" checked></div>
+        <div class="legend-item" data-layer="gt"><span class="legend-swatch" style="background:none;border-radius:50%;border:2px solid #2F6B4F;"></span> Titik Ground Truth (640) <input type="checkbox"></div>
+
+        <h4 style="margin-top:18px;">Basemap</h4>
+        <div class="basemap-toggle">
+          <button id="btn-light" class="active">Terang</button>
+          <button id="btn-sat">Satelit</button>
+        </div>
+        <p style="font-size:11.5px;color:var(--ink-soft);margin-top:14px;line-height:1.6;">
+          Klik poligon pada peta untuk melihat kategori, tahun, dan estimasi luas.
+        </p>
+      </div>
+      <div id="map"></div>
+    </div>
+
+    <div class="priority-panel">
+      <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);margin-bottom:4px;">Prioritas Tindakan per Kecamatan</h4>
+      <p style="font-size:11.5px;color:var(--ink-soft);margin:0 0 14px;line-height:1.6;">
+        Diurutkan dari yang paling perlu perhatian ke yang paling terjaga, berdasarkan net perubahan vegetasi
+        (gain&minus;loss) terhadap luas kecamatan &mdash; angka yang sama seperti pada badge bernomor di peta.
+        Klik salah satu baris untuk langsung fokus ke kecamatan tersebut di peta.
+      </p>
+      <div id="priorityList"><!-- filled by JS --></div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 2: DATA & PROSES ============ -->
+  <section class="tabpanel" id="tab-2">
+    <div class="section-label">Instruksi 4 &middot; Tab 2</div>
+    <h2>Data &amp; Proses &mdash; Transparansi Metodologi</h2>
+
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:8px;">Klik salah satu tahap untuk lompat &amp; sorot bagian kode yang sesuai di panel di bawah.</p>
+    <div class="flow" id="flowDiagram">
+      <div class="flow-step clickable" data-start="1" data-end="229">01 Sentinel-2<br>&amp; Cloud Mask</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-step clickable" data-start="230" data-end="488">02 Feature Stack<br>NDVI + NDMI</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-step clickable" data-start="489" data-end="672">03 Ground Truth<br>class 0/1 &times; year</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-step clickable" data-start="673" data-end="807">04 Split 60:40<br>seed 12345</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-step clickable" data-start="808" data-end="902">05 Random Forest<br>640 trees, klasifikasi</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-step clickable" data-start="903" data-end="1006">06 Evaluasi<br>APRF (testing 40%)</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-step clickable" data-start="1007" data-end="1179">07 Change<br>Detection</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-step clickable" data-start="1180" data-end="1368">08 Land Cover<br>Statistics</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-step clickable" data-start="1369" data-end="1597">09 Summary<br>&amp; Export</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-step clickable" data-start="1598" data-end="1739">10 Vector Export<br>Gain/Loss (SHP)</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-step" style="background:var(--veg-2);color:#fff;">WebGIS</div>
+    </div>
+
+    <div class="code-panel-wrap">
+      <div class="code-panel-header">
+        <span class="mono" id="codePanelTitle">gee/main_script.js &mdash; klik tahap di atas untuk fokus</span>
+        <button id="codeResetBtn" class="code-reset-btn">Lihat semua</button>
+      </div>
+      <div id="codeViewer" class="code-viewer"><div class="code-loading mono">Memuat kode&hellip;</div></div>
+    </div>
+
+    <table class="spec">
+      <tr><th>Parameter</th><th>2024</th><th>2025</th></tr>
+      <tr><td>Koleksi citra</td><td class="mono" colspan="2">COPERNICUS/S2_SR_HARMONIZED</td></tr>
+      <tr><td>Rentang tanggal (kode saat ini)</td><td class="mono">2024-01-01 &ndash; 2024-12-31</td><td class="mono">2025-01-01 &ndash; 2025-12-31</td></tr>
+      <tr><td>Ambang awan</td><td class="mono" colspan="2">CLOUDY_PIXEL_PERCENTAGE &lt; 20</td></tr>
+      <tr><td>Metode cloud mask</td><td class="mono" colspan="2">QA60 bitmask (cloud bit 10, cirrus bit 11)</td></tr>
+      <tr><td>Metode komposit</td><td class="mono" colspan="2">Median</td></tr>
+      <tr><td>Resolusi analisis</td><td class="mono" colspan="2">10 m (native band 10m Sentinel-2)</td></tr>
+      <tr><td>Band dasar</td><td class="mono" colspan="2">B2, B3, B4, B8, B11, B12</td></tr>
+      <tr><td>Indeks</td><td class="mono" colspan="2">NDVI = (B8&minus;B4)/(B8+B4) &middot; NDMI = (B8&minus;B11)/(B8+B11)</td></tr>
+      <tr><td>Batas administrasi</td><td class="mono" colspan="2">Shapefile 50 kelurahan / 6 kecamatan (struktur atribut GADM level-4)</td></tr>
+      <tr><td>Split training:testing</td><td class="mono" colspan="2">60:40, per kombinasi kelas &times; tahun, seed = 12345</td></tr>
+      <tr><td>Random Forest</td><td class="mono" colspan="2">numberOfTrees = 640, bagFraction = 0.7, minLeafPopulation = 1</td></tr>
+      <tr><td>Export otomatis dari GEE</td><td class="mono" colspan="2">ground_truth CSV, raster RF_2024/RF_2025, Change_2024_2025 raster, Gain/Loss vector (SHP), Summary_Statistik CSV</td></tr>
+    </table>
+
+    <div class="card" style="margin-bottom:28px;">
+      <h4>Unduh Data Mentah &mdash; Transparansi</h4>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin:-4px 0 4px;line-height:1.6;">
+        Semua layer yang dipakai peta di Tab 01 &mdash; dan skrip GEE lengkap yang menghasilkannya &mdash; bisa diunduh
+        langsung di sini, tanpa perlu akses ke Google Earth Engine, supaya siapa pun bisa memverifikasi atau
+        memakai ulang datanya.
+      </p>
+      <div class="download-grid">
+        <div class="download-card" style="border-color:#9FC7A8;">
+          <div class="dc-name">Confusion_Matrix.csv</div>
+          <div class="dc-desc">Confusion matrix mentah hasil <span class="mono" style="font-size:11px;">errorMatrix()</span> GEE (TN/FP/FN/TP, Accuracy, Precision, Recall, F1, Kappa) &mdash; sumber angka di Tab 03.</div>
+          <div class="dc-meta">CSV &middot; &asymp;1 KB</div>
+          <a class="download-btn" href="data/raw/Confusion_Matrix.csv" download>&darr; Unduh</a>
+        </div>
+        <div class="download-card" style="border-color:#9FC7A8;">
+          <div class="dc-name">Summary_Statistik_Mataram_2024_2025.csv</div>
+          <div class="dc-desc">Ringkasan luas vegetasi 2024/2025, gain/loss, net change, dan akurasi model &mdash; sumber angka di Tab 01 &amp; 04.</div>
+          <div class="dc-meta">CSV &middot; &asymp;1 KB</div>
+          <a class="download-btn" href="data/raw/Summary_Statistik_Mataram_2024_2025.csv" download>&darr; Unduh</a>
+        </div>
+        <div class="download-card" style="border-color:#9FC7A8;">
+          <div class="dc-name">ground_truth_mataram_2024_2025.csv</div>
+          <div class="dc-desc">640 titik ground truth mentah (longitude, latitude, class, year) langsung dari export GEE, sebelum dikonversi ke GeoJSON.</div>
+          <div class="dc-meta">CSV &middot; &asymp;28 KB</div>
+          <a class="download-btn" href="data/raw/ground_truth_mataram_2024_2025.csv" download>&darr; Unduh</a>
+        </div>
+        <div class="download-card">
+          <div class="dc-name">batas_kota.geojson</div>
+          <div class="dc-desc">Batas administrasi Kota Mataram (shapefile GADM level-4).</div>
+          <div class="dc-meta">GeoJSON &middot; &asymp;56 KB</div>
+          <a class="download-btn" href="data/batas_kota.geojson" download>&darr; Unduh</a>
+        </div>
+        <div class="download-card">
+          <div class="dc-name">kecamatan.geojson</div>
+          <div class="dc-desc">Batas 6 kecamatan Kota Mataram, dipakai untuk agregasi gain/loss.</div>
+          <div class="dc-meta">GeoJSON &middot; &asymp;145 KB</div>
+          <a class="download-btn" href="data/kecamatan.geojson" download>&darr; Unduh</a>
+        </div>
+        <div class="download-card">
+          <div class="dc-name">kecamatan_summary.json</div>
+          <div class="dc-desc">Ringkasan gain/loss (ha) per kecamatan, sumber panel Prioritas Tindakan.</div>
+          <div class="dc-meta">JSON &middot; &asymp;1 KB</div>
+          <a class="download-btn" href="data/kecamatan_summary.json" download>&darr; Unduh</a>
+        </div>
+        <div class="download-card">
+          <div class="dc-name">target_2024.geojson</div>
+          <div class="dc-desc">Poligon tutupan vegetasi hasil klasifikasi 2024 (divectorize dari raster RF_2024, MMU &plusmn;0,2 ha).</div>
+          <div class="dc-meta">GeoJSON &middot; &asymp;751 KB</div>
+          <a class="download-btn" href="data/target_2024.geojson" download>&darr; Unduh</a>
+        </div>
+        <div class="download-card">
+          <div class="dc-name">target_2025.geojson</div>
+          <div class="dc-desc">Poligon tutupan vegetasi hasil klasifikasi 2025, metode sama dengan 2024.</div>
+          <div class="dc-meta">GeoJSON &middot; &asymp;736 KB</div>
+          <a class="download-btn" href="data/target_2025.geojson" download>&darr; Unduh</a>
+        </div>
+        <div class="download-card">
+          <div class="dc-name">gain.geojson</div>
+          <div class="dc-desc">Poligon area yang berubah dari non-vegetasi ke vegetasi (0&rarr;1) antara 2024&ndash;2025.</div>
+          <div class="dc-meta">GeoJSON &middot; &asymp;806 KB</div>
+          <a class="download-btn" href="data/gain.geojson" download>&darr; Unduh</a>
+        </div>
+        <div class="download-card">
+          <div class="dc-name">loss.geojson</div>
+          <div class="dc-desc">Poligon area yang berubah dari vegetasi ke non-vegetasi (1&rarr;0) antara 2024&ndash;2025.</div>
+          <div class="dc-meta">GeoJSON &middot; &asymp;1,07 MB</div>
+          <a class="download-btn" href="data/loss.geojson" download>&darr; Unduh</a>
+        </div>
+        <div class="download-card">
+          <div class="dc-name">ground_truth.geojson</div>
+          <div class="dc-desc">640 titik ground truth (training + testing), kelas 0/1 &times; tahun 2024/2025.</div>
+          <div class="dc-meta">GeoJSON &middot; &asymp;94 KB</div>
+          <a class="download-btn" href="data/ground_truth.geojson" download>&darr; Unduh</a>
+        </div>
+        <div class="download-card">
+          <div class="dc-name">stats.json</div>
+          <div class="dc-desc">Statistik ringkasan kota: luas, persentase vegetasi, gain/loss, confusion matrix &amp; APRF.</div>
+          <div class="dc-meta">JSON &middot; &asymp;1 KB</div>
+          <a class="download-btn" href="data/stats.json" download>&darr; Unduh</a>
+        </div>
+        <div class="download-card">
+          <div class="dc-name">main_script.js</div>
+          <div class="dc-desc">Skrip lengkap Google Earth Engine (preprocessing sampai export) yang ditampilkan di panel kode di atas.</div>
+          <div class="dc-meta">JavaScript &middot; &asymp;25 KB</div>
+          <a class="download-btn" href="assets/main_script.js" download>&darr; Unduh</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h4>Ground truth &amp; sampling</h4>
+        <ul>
+          <li>Kelas 1 = vegetasi, kelas 0 = bukan vegetasi &mdash; dibuat terpisah untuk 2024 dan 2025.</li>
+          <li>Target rencana: 400 observasi (100 target 2024, 100 nontarget 2024, 100 target 2025, 100 nontarget 2025), di atas minimum soal 300.</li>
+          <li>Sebaran direncanakan merata di 6 kecamatan: Ampenan, Mataram, Cakranegara, Sekarbela, Selaparang, Sandubaya &mdash; mewakili pusat kota padat dan pinggiran yang masih hijau.</li>
+          <li>Digitasi manual per titik/polygon berdasarkan interpretasi citra RGB &amp; NDVI, tidak menyalin label 2024 ke 2025 tanpa cek ulang.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Status ekspor &amp; yang masih perlu dirapikan</h4>
+        <ul>
+          <li>✓ Change detection (4 kondisi), gain/loss vector, raster klasifikasi, dan CSV ringkasan <b>sudah</b> diekspor oleh Part 7&ndash;10 (lihat panel kode di bawah).</li>
+          <li>Gain/Loss saat ini diekspor sebagai <span class="mono" style="font-size:12px;">SHP</span>, sedangkan WebGIS ini butuh <span class="mono" style="font-size:12px;">GeoJSON</span> &mdash; konversi cepat lewat <a href="https://mapshaper.org" target="_blank" style="color:var(--veg-2);">mapshaper.org</a> (drag shp+dbf+shx, export as GeoJSON) atau <span class="mono" style="font-size:12px;">ogr2ogr -f GeoJSON out.geojson in.shp</span>.</li>
+          <li>Belum ada vectorize khusus untuk <span class="mono" style="font-size:12px;">target_2024</span> &amp; <span class="mono" style="font-size:12px;">target_2025</span> (baru raster) &mdash; tambahkan <span class="mono" style="font-size:12px;">reduceToVectors</span> pada <span class="mono" style="font-size:12px;">classified2024.eq(1)</span> dan <span class="mono" style="font-size:12px;">classified2025.eq(1)</span> lalu export GeoJSON.</li>
+          <li>Setelah 4 file GeoJSON siap, timpa file dengan nama sama di <span class="mono" style="font-size:12px;">webgis/data/</span>.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 3: EVALUASI MODEL ============ -->
+  <section class="tabpanel" id="tab-3">
+    <div class="section-label">Instruksi 4 &middot; Tab 3</div>
+    <h2>Evaluasi Model</h2>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-10px;margin-bottom:18px;">Dihitung dari <span class="mono">testingData.classify(rf).errorMatrix()</span> di GEE &mdash; lihat panel kode di Tab 2, bagian <span class="mono">06 Evaluasi</span>.</p>
+
+    <div class="cm-wrap">
+      <div>
+        <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);margin-bottom:10px;">Confusion Matrix (testing, n=278)</h4>
+        <table class="cm">
+          <tr><th></th><th>Prediksi: Non-Veg</th><th>Prediksi: Vegetasi</th></tr>
+          <tr><th>Aktual: Non-Veg</th><td class="tn">TN = 135</td><td class="fp">FP = 6</td></tr>
+          <tr><th>Aktual: Vegetasi</th><td class="fn">FN = 2</td><td class="tp">TP = 135</td></tr>
+        </table>
+        <p style="font-size:11.5px;color:var(--ink-soft);margin-top:10px;max-width:280px;line-height:1.6;">
+          Ground truth 640 titik (160 per kombinasi kelas&times;tahun). Confusion matrix dihitung dari
+          <span class="mono" style="font-size:11px;">errorMatrix()</span> atas sampel yang berhasil di-resample ke
+          feature stack (tidak tertutup awan/nodata), n=278 &mdash; data mentahnya bisa diunduh sebagai
+          <span class="mono" style="font-size:11px;">Confusion_Matrix.csv</span> di Tab 02.
+        </p>
+      </div>
+      <div class="aprf-grid" style="grid-template-columns:repeat(5,1fr);">
+        <div class="aprf-card"><div class="v">97.1%</div><div class="l">Accuracy</div></div>
+        <div class="aprf-card"><div class="v">95.7%</div><div class="l">Precision (kelas 1)</div></div>
+        <div class="aprf-card"><div class="v">98.5%</div><div class="l">Recall (kelas 1)</div></div>
+        <div class="aprf-card"><div class="v">97.1%</div><div class="l">F1-score (kelas 1)</div></div>
+        <div class="aprf-card"><div class="v">0.942</div><div class="l">Kappa</div></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h4>Interpretasi pola kesalahan</h4>
+        <ul>
+          <li>Model tetap sangat akurat pada data testing: hanya <b>8 kesalahan dari 278 sampel</b> (6 false positive, 2 false negative).</li>
+          <li><b>6 False Positive</b> &mdash; lahan non-vegetasi yang terklasifikasi sebagai vegetasi, kemungkinan lahan kosong/sawah kering dengan NDVI menengah yang mirip vegetasi jarang.</li>
+          <li><b>2 False Negative</b> &mdash; titik vegetasi tipis/kecil yang piksel 10&nbsp;m-nya bercampur dengan tutupan non-vegetasi di sekitarnya (mixed pixel).</li>
+          <li>Precision (95,7%) sedikit lebih rendah dari Recall (98,5%) &mdash; model punya kecenderungan ringan meng-overestimate luas vegetasi (lebih banyak false positive daripada false negative), meski keduanya tetap tinggi.</li>
+          <li>Kappa 0,942 (mendekati 1) tetap mengonfirmasi kesepakatan model dengan ground truth jauh di atas kebetulan acak.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Keterbatasan</h4>
+        <ul>
+          <li>Akurasi setinggi ini bisa terjadi karena ground truth diambil dari interpreter yang sama dan pada citra yang relatif bersih (cloud &lt; 20%) &mdash; performa di piksel batas/transisi kelas di lapangan bisa lebih rendah dari yang terukur di testing set.</li>
+          <li>Sebagian titik ground truth tidak terpakai dalam confusion matrix karena tertutup mask awan/nodata saat di-sample ke feature stack &mdash; area bertutupan awan persisten berpotensi kurang terwakili dalam evaluasi.</li>
+          <li>Resolusi 10 m tidak menangkap vegetasi individual sangat kecil (pohon tunggal, kebun sempit &lt; 100 m&sup2;).</li>
+          <li>Perbedaan musiman antara tanggal akuisisi 2024 dan 2025 (di luar kontrol composite median tahunan) dapat menambah noise pada NDVI di lahan pertanian musiman.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 4: INSIGHT HASIL ============ -->
+  <section class="tabpanel" id="tab-4">
+    <div class="section-label">Instruksi 4 &middot; Tab 4</div>
+    <h2>Insight Hasil <span style="font-size:13px;font-family:'IBM Plex Mono',monospace;color:var(--demo);vertical-align:middle;">&nbsp;&mdash; berdasar data contoh</span></h2>
+
+    <div class="insight-quote">
+      &ldquo;Datanya tidak menunjukkan bencana, tapi tren yang konsisten: dalam satu tahun Mataram kehilangan lebih banyak vegetasi daripada yang berhasil ditambahkan &mdash; dan itu cukup untuk membuat target 30% RTH makin jauh, bukan makin dekat.&rdquo;
+    </div>
+
+    <div class="stats-row" id="statsRow2"><!-- filled by JS --></div>
+
+    <div class="bar-chart">
+      <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);margin-bottom:14px;">Gain vs Loss Vegetasi per Kecamatan (ha)</h4>
+      <div id="kecBars"></div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h4>Kemungkinan penyebab (interpretasi hati-hati)</h4>
+        <ul>
+          <li>Loss (202,35 ha) hampir 1,45&times; lebih besar dari gain (139,66 ha) &mdash; polanya bukan kehilangan masif, tapi erosi bertahap yang konsisten dengan keluhan Bappeda soal sulitnya memenuhi target 30% RTH.</li>
+          <li><b>Sekarbela</b> mencatat loss tertinggi (&plusmn;33 ha) dan <b>Mataram</b> (kecamatan pusat kota) loss kedua tertinggi (&plusmn;28 ha) meski wilayahnya relatif kecil &mdash; sejalan dengan tekanan pembangunan di pusat kota.</li>
+          <li>Menariknya <b>Selaparang</b> mencatat gain tertinggi (&plusmn;31 ha) sekaligus loss terendah &mdash; kemungkinan efek program penghijauan lokal atau lahan yang sebelumnya terbuka mulai ditumbuhi vegetasi sekunder.</li>
+          <li>Ini adalah pola korelatif dari citra satelit pada resolusi 10 m, bukan bukti kausal &mdash; perlu verifikasi lapangan sebelum dijadikan dasar kebijakan definitif.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Potensi penggunaan &amp; rekomendasi</h4>
+        <ul>
+          <li><b>Pengguna potensial:</b> Dinas Lingkungan Hidup &amp; Bappeda (evaluasi RDTR &amp; target RTH 30%), akademisi, warga.</li>
+          <li><b>Rekomendasi:</b> monitoring berkala tiap musim kemarau, ground-truthing di kecamatan dengan loss tertinggi, integrasi dengan data RTH resmi kota.</li>
+          <li><b>Keterbatasan:</b> hasil bergantung kualitas ground truth &amp; ambang cloud &mdash; lihat Tab 3 untuk detail.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:36px;">Analisis Lanjutan</div>
+    <h3 style="font-family:'Fraunces',serif;font-size:20px;margin-bottom:6px;">Uji Statistik &amp; Dekomposisi Perubahan</h3>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 18px;line-height:1.6;max-width:860px;">
+      Bagian di bawah bukan sekadar rekap angka &mdash; tapi pengujian statistik formal atas confusion matrix
+      dan dekomposisi perubahan lahan, supaya klaim &ldquo;vegetasi berkurang&rdquo; punya dasar kuantitatif
+      yang bisa diuji ulang, bukan cuma pembacaan visual dari peta. Semua dihitung langsung dari
+      <span class="mono" style="font-size:11.5px;">stats.json</span> &amp;
+      <span class="mono" style="font-size:11.5px;">kecamatan_summary.json</span> di sisi klien &mdash; ganti datanya, angka &amp; visualisasi di bawah ikut berubah.
+    </p>
+
+    <div class="stat-analysis-grid">
+      <div class="stat-panel">
+        <h4>1. Metrik Turunan Confusion Matrix</h4>
+        <div class="formula">Specificity=TN/(TN+FP) &middot; NPV=TN/(TN+FN) &middot; MCC=(TP&middot;TN&minus;FP&middot;FN)/&radic;((TP+FP)(TP+FN)(TN+FP)(TN+FN))</div>
+        <div class="stat-mini-grid" id="extMetricsGrid"><!-- filled by JS --></div>
+        <p class="stat-note" id="extMetricsNote"></p>
+      </div>
+
+      <div class="stat-panel">
+        <h4>2. Selang Kepercayaan 95% Akurasi (Wilson Score Interval)</h4>
+        <div class="formula">CI = [p&#772;+z&sup2;/2n &plusmn; z&radic;(p&#772;(1&minus;p&#772;)/n+z&sup2;/4n&sup2;)] / (1+z&sup2;/n), z=1,96</div>
+        <div id="ciBarWrap"></div>
+        <p class="stat-note" id="ciNote"></p>
+      </div>
+
+      <div class="stat-panel">
+        <h4>3. Uji McNemar &mdash; Simetri Kesalahan FP vs FN</h4>
+        <div class="formula">&chi;&sup2; = (|FP&minus;FN|&minus;1)&sup2; / (FP+FN), df=1, nilai kritis (&alpha;=0,05) = 3,841</div>
+        <div class="mcnemar-bars" id="mcnemarBars"></div>
+        <p class="stat-note" id="mcnemarNote"></p>
+      </div>
+
+      <div class="stat-panel">
+        <h4>4. Dekomposisi Net Change vs Swap Change</h4>
+        <div class="formula">Total = Gain+Loss = |Gain&minus;Loss| + 2&middot;min(Gain,Loss) = Net + Swap</div>
+        <div class="swap-bar" id="swapBar"></div>
+        <p class="stat-note" id="swapNote"></p>
+      </div>
+
+      <div class="stat-panel">
+        <h4>5. Standardisasi Z-Score Perubahan Vegetasi per Kecamatan</h4>
+        <div class="formula">z&#7522; = (x&#7522; &minus; &mu;) / &sigma;, dengan &mu; = rata-rata dan &sigma; = simpangan baku populasi (n=6 kecamatan)</div>
+        <div id="zScoreRows"></div>
+        <p class="stat-note" id="zScoreNote"></p>
+      </div>
+
+      <div class="stat-panel">
+        <h4>6. Dekomposisi Cohen&rsquo;s Kappa: Observed vs Expected Agreement</h4>
+        <div class="formula">Po=(TP+TN)/n &middot; Pe=[(TP+FP)(TP+FN)+(FN+TN)(FP+TN)]/n&sup2; &middot; &kappa;=(Po&minus;Pe)/(1&minus;Pe)</div>
+        <div class="mcnemar-bars" id="kappaBars"></div>
+        <p class="stat-note" id="kappaNote"></p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="chartTooltip" class="chart-tooltip"></div>
+
+<footer>
+  <span>Repository: github.com/&lt;isi-tautan-repo&gt; &middot; Laporan PDF: &lt;isi-tautan&gt;</span>
+  <span>UAS Kapita Selekta Sistem Informasi &middot; Semester 6, 2025/2026 &middot; Universitas Bakrie</span>
+</footer>
+
+<script src="assets/leaflet.js"></script>
+<script>
+// ---------- TAB SWITCH ----------
+document.querySelectorAll('.band-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.band-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='1'){ setTimeout(()=>map.invalidateSize(),50); }
+  });
+});
+
+// ---------- MAP ----------
+// ---------- THEME SWITCH: Editorial (default) vs Apple-style Clean ----------
+(function(){
+  var THEME_KEY = 'mataram-ui-theme';
+  var root = document.documentElement;
+  var saved = localStorage.getItem(THEME_KEY) || 'default';
+
+  function applyTheme(t){
+    if(t==='apple') root.setAttribute('data-theme','apple');
+    else root.removeAttribute('data-theme');
+    document.querySelectorAll('.theme-switch .ts-opt').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.themeValue===t);
+    });
+    setTimeout(function(){ if(window.map) window.map.invalidateSize(); }, 80);
+  }
+
+  document.querySelectorAll('.theme-switch .ts-opt').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = btn.dataset.themeValue;
+      localStorage.setItem(THEME_KEY, t);
+      applyTheme(t);
+    });
+  });
+
+  applyTheme(saved);
+})();
+
+var map = L.map('map', {scrollWheelZoom:true}).setView([-8.588, 116.115], 12);
+window.map = map;
+
+var light = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+  attribution:'&copy; OpenStreetMap &copy; CARTO', maxZoom:19
+}).addTo(map);
+var sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+  attribution:'Tiles &copy; Esri', maxZoom:19
+});
+
+document.getElementById('btn-light').addEventListener('click',function(){
+  map.removeLayer(sat); map.addLayer(light);
+  this.classList.add('active'); document.getElementById('btn-sat').classList.remove('active');
+});
+document.getElementById('btn-sat').addEventListener('click',function(){
+  map.removeLayer(light); map.addLayer(sat);
+  this.classList.add('active'); document.getElementById('btn-light').classList.remove('active');
+});
+
+var layers = {};
+var styles = {
+  batas: {color:'#A8452E', weight:2.5, fill:false},
+  t24: {color:'#2C5E82', weight:0.5, fillColor:'#4A90C4', fillOpacity:0.55},
+  t25: {color:'#1D4636', weight:0.5, fillColor:'#2F6B4F', fillOpacity:0.55},
+  gain: {color:'#8A6423', weight:0.5, fillColor:'#C99A3D', fillOpacity:0.65},
+  loss: {color:'#7A311F', weight:0.5, fillColor:'#A8452E', fillOpacity:0.65}
+};
+var labels = {batas:'Batas Kota Mataram', t24:'Target Vegetasi 2024', t25:'Target Vegetasi 2025', gain:'Gain (0→1)', loss:'Loss (1→0)'};
+
+function loadLayer(key, file, defaultOn){
+  fetch('data/'+file)
+    .then(r=>r.json())
+    .then(gj=>{
+      var lyr = L.geoJSON(gj, {
+        style: styles[key],
+        onEachFeature: function(feature, l){
+          var props = feature.properties || {};
+          l.bindPopup(
+            '<b>'+labels[key]+'</b><br>'+
+            (props.kategori ? 'Kategori: '+props.kategori+'<br>' : '') +
+            (props.NAME_3 ? 'Kecamatan: '+props.NAME_3+'<br>' : '')
+          );
+        }
+      });
+      layers[key] = lyr;
+      if(defaultOn) lyr.addTo(map);
+    })
+    .catch(()=>console.warn('Gagal memuat layer', file));
+}
+
+loadLayer('batas','batas_kota.geojson', true);
+loadLayer('t24','target_2024.geojson', true);
+loadLayer('t25','target_2025.geojson', false);
+loadLayer('gain','gain.geojson', true);
+loadLayer('loss','loss.geojson', true);
+
+// ---------- KECAMATAN: kategorisasi bertambah/berkurang + tooltip hover ----------
+// Luas tiap kecamatan dihitung dari geometrinya sendiri (proyeksi equirectangular
+// lokal, cukup akurat untuk skala kota), lalu net gain-loss dari kecamatan_summary.json
+// dibagi luas itu untuk dapat persentase perubahan riil terhadap luas wilayahnya.
+function ringAreaM2(ring, mPerDegLat, mPerDegLon){
+  var sum = 0;
+  for(var i=0;i<ring.length;i++){
+    var p1 = ring[i], p2 = ring[(i+1)%ring.length];
+    var x1 = p1[0]*mPerDegLon, y1 = p1[1]*mPerDegLat;
+    var x2 = p2[0]*mPerDegLon, y2 = p2[1]*mPerDegLat;
+    sum += (x1*y2 - x2*y1);
+  }
+  return Math.abs(sum/2);
+}
+function polygonAreaHa(geometry){
+  var firstPt = geometry.type==='Polygon' ? geometry.coordinates[0][0] : geometry.coordinates[0][0][0];
+  var latRef = firstPt[1];
+  var mPerDegLat = 111320;
+  var mPerDegLon = 111320*Math.cos(latRef*Math.PI/180);
+  var polys = geometry.type==='Polygon' ? [geometry.coordinates] : geometry.coordinates;
+  var totalM2 = 0;
+  polys.forEach(function(rings){
+    var outer = ringAreaM2(rings[0], mPerDegLat, mPerDegLon);
+    var holes = 0;
+    for(var i=1;i<rings.length;i++) holes += ringAreaM2(rings[i], mPerDegLat, mPerDegLon);
+    totalM2 += (outer - holes);
+  });
+  return totalM2/10000;
+}
+
+var TIER_COLOR = {tinggi:'#A8452E', sedang:'#C99A3D', rendah:'#C99A3D', terjaga:'#2F6B4F'};
+var TIER_LABEL = {tinggi:'Prioritas Tinggi', sedang:'Prioritas Sedang', rendah:'Prioritas Rendah', terjaga:'Kondisi Terjaga'};
+function actionText(tier, name){
+  if(tier==='tinggi') return 'Percepat program penghijauan &amp; perketat izin alih fungsi lahan di '+name+'.';
+  if(tier==='sedang') return 'Pantau berkala tiap musim kemarau &amp; evaluasi RDTR di '+name+'.';
+  if(tier==='rendah') return 'Masih menyusut tipis, tapi paling ringan dibanding kecamatan lain &mdash; cukup pantau berkala agar '+name+' tidak memburuk.';
+  return 'Pertahankan capaian '+name+' &amp; jadikan acuan program penghijauan kecamatan lain.';
+}
+
+Promise.all([
+  fetch('data/kecamatan.geojson').then(r=>r.json()),
+  fetch('data/kecamatan_summary.json').then(r=>r.json())
+]).then(([kecGj, kecSummary])=>{
+  var kecList = [];
+
+  var lyr = L.geoJSON(kecGj, {
+    style: function(feature){
+      var s = kecSummary[feature.properties.NAME_3] || {gain:0, loss:0};
+      var net = (s.gain||0) - (s.loss||0);
+      return {
+        color:'#4A5A4E', weight:1.2, dashArray:'4,3',
+        fillColor: net>=0 ? '#2F6B4F' : '#A8452E',
+        fillOpacity: 0.22
+      };
+    },
+    onEachFeature: function(feature, l){
+      var name = feature.properties.NAME_3;
+      var s = kecSummary[name] || {gain:0, loss:0};
+      var areaHa = polygonAreaHa(feature.geometry);
+      var net = (s.gain||0) - (s.loss||0);
+      var pct = areaHa>0 ? (net/areaHa*100) : 0;
+      var isUp = net>=0;
+      l.bindTooltip(
+        '<b>'+name+'</b><br>'+
+        'Status: <b style="color:'+(isUp?'#2F6B4F':'#A8452E')+'">'+(isUp?'Bertambah':'Berkurang')+'</b><br>'+
+        'Net perubahan: '+(net>=0?'+':'')+net.toFixed(2)+' ha ('+(pct>=0?'+':'')+pct.toFixed(2)+'% dari luas kecamatan)<br>'+
+        '<span style="color:#4A5A4E;">Gain '+(s.gain||0).toFixed(2)+' ha &middot; Loss '+(s.loss||0).toFixed(2)+' ha</span>',
+        {sticky:true}
+      );
+      kecList.push({name:name, net:net, pct:pct, areaHa:areaHa, gain:s.gain||0, loss:s.loss||0, bounds:l.getBounds()});
+    }
+  });
+  layers['kecamatan'] = lyr;
+
+  // ---------- PRIORITAS TINDAKAN: rank 1 (paling perlu perhatian) s/d 6 (paling terjaga) ----------
+  // Hijau ("Kondisi Terjaga") hanya untuk net perubahan positif (0+). Yang masih minus
+  // dipecah tinggi/sedang/rendah berdasar urutan keparahannya di antara sesama yang minus.
+  kecList.sort(function(a,b){ return a.pct - b.pct; });
+  var negRank = 0;
+  kecList.forEach(function(item, i){
+    item.rank = i+1;
+    if(item.net >= 0){
+      item.tier = 'terjaga';
+    } else {
+      negRank++;
+      item.tier = negRank<=2 ? 'tinggi' : (negRank<=4 ? 'sedang' : 'rendah');
+    }
+    item.action = actionText(item.tier, item.name);
+  });
+
+  var badgeMarkers = kecList.map(function(item){
+    var icon = L.divIcon({
+      className: '',
+      html: '<div class="priority-marker" style="background:'+TIER_COLOR[item.tier]+';">'+item.rank+'</div>',
+      iconSize: [26,26], iconAnchor: [13,13]
+    });
+    var marker = L.marker(item.bounds.getCenter(), {icon:icon});
+    marker.bindTooltip(
+      '<b>'+item.name+'</b> &mdash; Rank '+item.rank+'/6<br>'+
+      '<b style="color:'+TIER_COLOR[item.tier]+';">'+TIER_LABEL[item.tier]+'</b> ('+(item.pct>=0?'+':'')+item.pct.toFixed(2)+'%)<br>'+
+      '<span style="color:#4A5A4E;">'+item.action+'</span>',
+      {sticky:true}
+    );
+    item.marker = marker;
+    return marker;
+  });
+  layers['priority'] = L.layerGroup(badgeMarkers).addTo(map);
+
+  document.getElementById('priorityList').innerHTML = kecList.map(function(item){
+    return '<div class="priority-row" data-name="'+item.name+'">'+
+      '<div class="priority-rank" style="background:'+TIER_COLOR[item.tier]+';">'+item.rank+'</div>'+
+      '<div><div class="priority-name">'+item.name+'</div>'+
+        '<span class="priority-tier" style="background:'+TIER_COLOR[item.tier]+'22;color:'+TIER_COLOR[item.tier]+';">'+TIER_LABEL[item.tier]+'</span></div>'+
+      '<div class="priority-action">'+item.action+'</div>'+
+      '<div class="priority-pct" style="color:'+TIER_COLOR[item.tier]+';">'+(item.pct>=0?'+':'')+item.pct.toFixed(2)+'%</div>'+
+    '</div>';
+  }).join('');
+
+  document.querySelectorAll('.priority-row').forEach(function(row){
+    row.addEventListener('click', function(){
+      var item = kecList.find(function(k){ return k.name===row.dataset.name; });
+      if(!item) return;
+      setLayerVisible('priority', true);
+      map.fitBounds(item.bounds.pad(0.25));
+      item.marker.openTooltip();
+      document.getElementById('map').scrollIntoView({behavior:'smooth', block:'center'});
+    });
+  });
+}).catch(()=>console.warn('Gagal memuat kecamatan.geojson / kecamatan_summary.json'));
+
+// Ground truth: titik (circleMarker), warna beda per kelas, tooltip muncul saat dihover.
+fetch('data/ground_truth.geojson')
+  .then(r=>r.json())
+  .then(gj=>{
+    var lyr = L.geoJSON(gj, {
+      pointToLayer: function(feature, latlng){
+        var isVeg = feature.properties.class === 1;
+        return L.circleMarker(latlng, {
+          radius: 5,
+          fillColor: isVeg ? '#2F6B4F' : '#A8452E',
+          color: '#1E2A22',
+          weight: 0.6,
+          fillOpacity: 0.85
+        });
+      },
+      onEachFeature: function(feature, l){
+        var p = feature.properties;
+        l.bindTooltip(
+          '<b>Ground Truth</b><br>Kelas: '+(p.class===1?'Vegetasi':'Non-Vegetasi')+'<br>Tahun: '+p.year,
+          {sticky:true}
+        );
+      }
+    });
+    layers['gt'] = lyr;
+  })
+  .catch(()=>console.warn('Gagal memuat ground_truth.geojson'));
+
+var legendCheckboxes = {};
+document.querySelectorAll('.legend-item').forEach(item=>{
+  var key = item.dataset.layer;
+  legendCheckboxes[key] = item.querySelector('input');
+});
+
+function setLayerVisible(key, visible){
+  if(layers[key]){
+    if(visible) layers[key].addTo(map); else map.removeLayer(layers[key]);
+  }
+  if(legendCheckboxes[key]) legendCheckboxes[key].checked = visible;
+  var barRow = document.querySelector('.year-bar-row[data-layer="'+key+'"]');
+  if(barRow) barRow.classList.toggle('off', !visible);
+}
+
+document.querySelectorAll('.legend-item').forEach(item=>{
+  var key = item.dataset.layer;
+  var cb = item.querySelector('input');
+  cb.addEventListener('change',()=> setLayerVisible(key, cb.checked));
+  item.addEventListener('click',(e)=>{ if(e.target.tagName!=='INPUT'){ setLayerVisible(key, !cb.checked); } });
+});
+
+// ---------- STATS ----------
+fetch('data/stats.json').then(r=>r.json()).then(s=>{
+  var html = `
+    <div class="stat-card"><div class="v">${s.city_area_ha.toLocaleString('id-ID')} ha</div><div class="l">Luas Kota Mataram</div></div>
+    <div class="stat-card"><div class="v">${s.pct_2024}%</div><div class="l">Vegetasi 2024</div></div>
+    <div class="stat-card"><div class="v">${s.pct_2025}%</div><div class="l">Vegetasi 2025</div></div>
+    <div class="stat-card"><div class="v loss-v">${s.pct_change_vs_2024}%</div><div class="l">Perubahan vs 2024</div></div>
+    <div class="stat-card"><div class="v" style="color:#C99A3D">+${s.gain_ha} ha</div><div class="l">Gain</div></div>
+    <div class="stat-card"><div class="v loss-v">-${s.loss_ha} ha</div><div class="l">Loss</div></div>
+  `;
+  document.getElementById('statsRow').innerHTML = html;
+
+  // ---------- YEAR COMPARE CHART (interactive, Tab 1) ----------
+  var yearHtml = `
+    <div class="year-bar-row" data-layer="t24" data-tooltip="Vegetasi 2024: ${s.target_2024_ha.toLocaleString('id-ID')} ha &middot; ${s.pct_2024}% dari luas Kota Mataram (${s.city_area_ha.toLocaleString('id-ID')} ha)">
+      <div class="yb-label" style="color:#2C5E82;">2024</div>
+      <div class="year-bar-track"><div class="year-bar-fill" style="background:#4A90C4;width:${s.pct_2024}%"></div></div>
+      <div class="yb-val">${s.pct_2024}%</div>
+    </div>
+    <div class="year-bar-row" data-layer="t25" data-tooltip="Vegetasi 2025: ${s.target_2025_ha.toLocaleString('id-ID')} ha &middot; ${s.pct_2025}% dari luas Kota Mataram &middot; ${s.net_change_ha} ha (${s.pct_change_vs_2024}%) dibanding 2024">
+      <div class="yb-label" style="color:#1D4636;">2025</div>
+      <div class="year-bar-track"><div class="year-bar-fill" style="background:#2F6B4F;width:${s.pct_2025}%"></div></div>
+      <div class="yb-val">${s.pct_2025}%</div>
+    </div>
+  `;
+  document.getElementById('yearBars').innerHTML = yearHtml;
+
+  var chartTooltip = document.getElementById('chartTooltip');
+  document.querySelectorAll('.year-bar-row').forEach(row=>{
+    var key = row.dataset.layer;
+    row.classList.toggle('off', !(legendCheckboxes[key] && legendCheckboxes[key].checked));
+    row.addEventListener('click', ()=>{
+      var cb = legendCheckboxes[key];
+      setLayerVisible(key, cb ? !cb.checked : true);
+    });
+    row.addEventListener('mouseenter', ()=>{
+      chartTooltip.textContent = row.dataset.tooltip;
+      chartTooltip.style.display = 'block';
+    });
+    row.addEventListener('mousemove', (e)=>{
+      chartTooltip.style.left = (e.clientX+14)+'px';
+      chartTooltip.style.top = (e.clientY+14)+'px';
+    });
+    row.addEventListener('mouseleave', ()=>{ chartTooltip.style.display = 'none'; });
+  });
+
+  document.getElementById('statsRow2').innerHTML = `
+    <div class="stat-card"><div class="v">${s.target_2024_ha.toLocaleString('id-ID')} ha</div><div class="l">Luas Target 2024</div></div>
+    <div class="stat-card"><div class="v">${s.target_2025_ha.toLocaleString('id-ID')} ha</div><div class="l">Luas Target 2025</div></div>
+    <div class="stat-card"><div class="v loss-v">${s.net_change_ha.toLocaleString('id-ID')} ha</div><div class="l">Net Change</div></div>
+    <div class="stat-card"><div class="v loss-v">${s.pct_change_vs_2024}%</div><div class="l">% Perubahan thd 2024</div></div>
+  `;
+});
+
+// ---------- CODE VIEWER (Tab 2) ----------
+var codeLines = [];
+var codeViewerEl = document.getElementById('codeViewer');
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlightJs(line){
+  var esc = escapeHtml(line);
+  // comments
+  if(/^\s*\/\//.test(esc)){
+    return '<span class="tok-comment">'+esc+'</span>';
+  }
+  // strings (single/double quotes)
+  esc = esc.replace(/('([^'\\]|\\.)*')|("([^"\\]|\\.)*")/g, function(m){return '<span class="tok-string">'+m+'</span>';});
+  // keywords
+  esc = esc.replace(/\b(var|function|return|if|else|for|true|false|null)\b/g, '<span class="tok-keyword">$1</span>');
+  // ee./Map./Export./ui. namespaced calls
+  esc = esc.replace(/\b(ee|Map|Export|ui|print)\.[A-Za-z_.]+/g, function(m){return '<span class="tok-func">'+m+'</span>';});
+  // numbers
+  esc = esc.replace(/\b(\d+\.?\d*)\b/g, '<span class="tok-number">$1</span>');
+  return esc;
+}
+
+fetch('assets/main_script.js')
+  .then(r=>r.text())
+  .then(text=>{
+    codeLines = text.split('\n');
+    renderCode();
+  })
+  .catch(()=>{
+    codeViewerEl.innerHTML = '<div class="code-loading mono">Tidak bisa memuat assets/main_script.js — pastikan dibuka lewat server lokal (bukan file://), lihat README.</div>';
+  });
+
+function renderCode(startHighlight, endHighlight){
+  var html = '';
+  for(var i=0;i<codeLines.length;i++){
+    var lineNo = i+1;
+    var inRange = startHighlight && lineNo>=startHighlight && lineNo<=endHighlight;
+    var cls = 'codeline'+(inRange?' in-range':'');
+    if(inRange && lineNo===startHighlight) cls += ' range-start';
+    if(inRange && lineNo===endHighlight) cls += ' range-end';
+    html += '<div class="'+cls+'" id="ln-'+lineNo+'"><span class="ln">'+lineNo+'</span><span class="code-text">'+highlightJs(codeLines[i]||' ')+'</span></div>';
+  }
+  codeViewerEl.innerHTML = html;
+}
+
+document.querySelectorAll('.flow-step.clickable').forEach(step=>{
+  step.addEventListener('click',()=>{
+    document.querySelectorAll('.flow-step.clickable').forEach(s=>s.classList.remove('selected'));
+    step.classList.add('selected');
+    var start = parseInt(step.dataset.start,10);
+    var end = parseInt(step.dataset.end,10);
+    renderCode(start,end);
+    document.getElementById('codePanelTitle').textContent = 'gee/main_script.js — baris '+start+'–'+end+' ('+step.textContent.replace(/\s+/g,' ').trim()+')';
+    setTimeout(()=>{
+      var target = document.getElementById('ln-'+start);
+      if(target) target.scrollIntoView({block:'center', behavior:'smooth'});
+    }, 60);
+  });
+});
+
+document.getElementById('codeResetBtn').addEventListener('click',()=>{
+  document.querySelectorAll('.flow-step.clickable').forEach(s=>s.classList.remove('selected'));
+  document.getElementById('codePanelTitle').textContent = 'gee/main_script.js — klik tahap di atas untuk fokus';
+  renderCode();
+});
+
+// ---------- KECAMATAN BAR CHART (gain vs loss ha) ----------
+fetch('data/kecamatan_summary.json').then(r=>r.json()).then(data=>{
+  var entries = Object.entries(data).map(([k,v])=>[k, v.gain||0, v.loss||0]).sort((a,b)=>b[2]-a[2]);
+  var max = Math.max(...entries.flatMap(e=>[e[1],e[2]]));
+  var html = entries.map(([name,gain,loss])=>`
+    <div style="margin-bottom:10px;">
+      <div style="font-size:12.5px;font-weight:600;margin-bottom:4px;">${name}</div>
+      <div class="bar-row" style="grid-template-columns:60px 1fr 60px;">
+        <div style="color:var(--gain);font-size:11px;">Gain</div>
+        <div class="bar-track"><div class="bar-fill" style="background:var(--gain);width:${(gain/max*100).toFixed(1)}%"></div></div>
+        <div class="val">${gain.toFixed(1)} ha</div>
+      </div>
+      <div class="bar-row" style="grid-template-columns:60px 1fr 60px;">
+        <div style="color:var(--loss);font-size:11px;">Loss</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(loss/max*100).toFixed(1)}%"></div></div>
+        <div class="val">${loss.toFixed(1)} ha</div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('kecBars').innerHTML = html;
+});
+
+// ---------- TAB 4: ANALISIS STATISTIK LANJUTAN ----------
+Promise.all([
+  fetch('data/stats.json').then(r=>r.json()),
+  fetch('data/kecamatan.geojson').then(r=>r.json()),
+  fetch('data/kecamatan_summary.json').then(r=>r.json())
+]).then(([s, kecGj, kecSummary])=>{
+  var cm = s.confusion_matrix;
+  var TN=cm.TN, FP=cm.FP, FN=cm.FN, TP=cm.TP;
+  var n = TN+FP+FN+TP;
+
+  // ---- 1. Metrik turunan confusion matrix ----
+  var specificity = TN/(TN+FP);
+  var npv = TN/(TN+FN);
+  var fpr = FP/(FP+TN);
+  var fnr = FN/(FN+TP);
+  var balAcc = (cm.recall+specificity)/2;
+  var mcc = (TP*TN - FP*FN)/Math.sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN));
+
+  document.getElementById('extMetricsGrid').innerHTML = [
+    ['Specificity', specificity, 'pct'], ['NPV', npv, 'pct'], ['FPR', fpr, 'pct'],
+    ['FNR', fnr, 'pct'], ['Balanced Acc.', balAcc, 'pct'], ['MCC', mcc, 'raw']
+  ].map(function(row){
+    var label=row[0], val=row[1], kind=row[2];
+    var display = kind==='raw' ? val.toFixed(3) : (val*100).toFixed(2)+'%';
+    return '<div class="stat-mini-card"><div class="v">'+display+'</div><div class="l">'+label+'</div></div>';
+  }).join('');
+
+  document.getElementById('extMetricsNote').innerHTML =
+    'Karena TP ('+TP+') dan TN ('+TN+') kebetulan persis sama di confusion matrix ini, Precision ('+(cm.precision*100).toFixed(2)+'%) '+
+    'secara matematis identik dengan Specificity, dan Recall ('+(cm.recall*100).toFixed(2)+'%) identik dengan NPV. '+
+    'MCC = '+mcc.toFixed(3)+' (skala &minus;1 s/d +1, memperhitungkan keempat sel sekaligus) tetap tinggi meski FP ('+FP+') jauh melebihi FN ('+FN+') '+
+    '&mdash; tanda model tidak sekadar "menang" lewat kelas mayoritas.';
+
+  // ---- 2. Wilson score interval untuk akurasi ----
+  var p = cm.accuracy, z = 1.96;
+  var denom = 1+(z*z)/n;
+  var center = (p + (z*z)/(2*n))/denom;
+  var margin = z*Math.sqrt(p*(1-p)/n + (z*z)/(4*n*n))/denom;
+  var lo = center-margin, hi = center+margin;
+
+  var viewMin = 0.85, viewMax = 1.0;
+  function toPct(v){ return Math.max(0,Math.min(100,(v-viewMin)/(viewMax-viewMin)*100)); }
+  document.getElementById('ciBarWrap').innerHTML =
+    '<div class="ci-track">'+
+      '<div class="ci-range" style="left:'+toPct(lo).toFixed(1)+'%;width:'+(toPct(hi)-toPct(lo)).toFixed(1)+'%;"></div>'+
+      '<div class="ci-point" style="left:'+toPct(p).toFixed(1)+'%;"></div>'+
+    '</div>'+
+    '<div class="ci-scale"><span>'+(viewMin*100).toFixed(0)+'%</span><span>'+(((viewMin+viewMax)/2)*100).toFixed(0)+'%</span><span>'+(viewMax*100).toFixed(0)+'%</span></div>';
+  document.getElementById('ciNote').innerHTML =
+    'Titik estimasi akurasi = '+(p*100).toFixed(2)+'%, selang kepercayaan 95%: <b>['+(lo*100).toFixed(2)+'%, '+(hi*100).toFixed(2)+'%]</b>. '+
+    'Dengan n='+n+' sampel testing, kita 95% yakin akurasi populasi sebenarnya ada di rentang itu &mdash; Wilson interval dipakai '+
+    '(bukan normal approximation biasa) karena lebih stabil saat proporsi mendekati 100% dan n tidak terlalu besar.';
+
+  // ---- 3. Uji McNemar ----
+  var chi2 = Math.pow(Math.abs(FP-FN)-1, 2)/(FP+FN);
+  var critical = 3.841;
+  var significant = chi2 > critical;
+  var maxBar = Math.max(FP,FN);
+  document.getElementById('mcnemarBars').innerHTML =
+    '<div class="mcnemar-col"><div class="mn-val">'+FP+'</div><div class="mcnemar-bar" style="height:'+(FP/maxBar*100)+'%;"></div><div class="mn-label">False Positive</div></div>'+
+    '<div class="mcnemar-col"><div class="mn-val">'+FN+'</div><div class="mcnemar-bar" style="height:'+(FN/maxBar*100)+'%;background:var(--gain);"></div><div class="mn-label">False Negative</div></div>';
+  document.getElementById('mcnemarNote').innerHTML =
+    '&chi;&sup2; = '+chi2.toFixed(3)+' '+(significant?'&gt;':'&le;')+' 3,841 &rarr; '+
+    (significant
+      ? '<b>signifikan</b> pada &alpha;=0,05: model punya bias sistematis ke salah satu arah kesalahan.'
+      : '<b>tidak signifikan</b> pada &alpha;=0,05 &mdash; walau FP ('+FP+') tiga kali lebih banyak dari FN ('+FN+'), sampelnya terlalu kecil untuk menyimpulkan model benar-benar bias mengoverestimasi vegetasi; bisa jadi kebetulan sampling.');
+
+  // ---- 4. Dekomposisi Net vs Swap change ----
+  var gain = s.gain_ha, loss = s.loss_ha;
+  var gross = gain+loss;
+  var net = Math.abs(gain-loss);
+  var swap = 2*Math.min(gain,loss);
+  var swapPct = swap/gross*100, netPct = net/gross*100;
+  document.getElementById('swapBar').innerHTML =
+    '<div class="swap-seg" style="width:'+netPct.toFixed(1)+'%;background:var(--loss);">'+netPct.toFixed(0)+'% Net</div>'+
+    '<div class="swap-seg" style="width:'+swapPct.toFixed(1)+'%;background:var(--gain);">'+swapPct.toFixed(0)+'% Swap</div>';
+  document.getElementById('swapNote').innerHTML =
+    'Dari total '+gross.toFixed(2)+' ha lahan yang berpindah kelas, cuma <b>'+net.toFixed(2)+' ha ('+netPct.toFixed(1)+'%)</b> yang merupakan net loss riil. '+
+    'Sisanya, <b>'+swap.toFixed(2)+' ha ('+swapPct.toFixed(1)+'%)</b>, adalah &ldquo;swap&rdquo; &mdash; vegetasi hilang di satu titik dan tumbuh di titik lain '+
+    'pada tahun yang sama, saling menutupi di angka net change. Turnover riil di lapangan jauh lebih besar dari yang terlihat pada angka net &minus;'+Math.abs(s.net_change_ha).toFixed(2)+' ha semata.';
+
+  // ---- 5. Z-score standardisasi per kecamatan ----
+  var items = [];
+  kecGj.features.forEach(function(f){
+    var name = f.properties.NAME_3;
+    var sm = kecSummary[name] || {gain:0, loss:0};
+    var areaHa = polygonAreaHa(f.geometry);
+    var netK = (sm.gain||0)-(sm.loss||0);
+    var pct = areaHa>0 ? netK/areaHa*100 : 0;
+    items.push({name:name, pct:pct});
+  });
+  var mean = items.reduce(function(a,b){return a+b.pct;},0)/items.length;
+  var variance = items.reduce(function(a,b){return a+Math.pow(b.pct-mean,2);},0)/items.length;
+  var sigma = Math.sqrt(variance);
+  items.forEach(function(it){ it.z = sigma>0 ? (it.pct-mean)/sigma : 0; });
+  items.sort(function(a,b){return a.z-b.z;});
+  var maxAbsZ = Math.max.apply(null, items.map(function(it){return Math.abs(it.z);}));
+
+  document.getElementById('zScoreRows').innerHTML = items.map(function(it){
+    var widthPct = maxAbsZ>0 ? (Math.abs(it.z)/maxAbsZ*50) : 0;
+    var isOutlier = Math.abs(it.z)>2;
+    var barLeft = it.z>=0 ? 50 : 50-widthPct;
+    var color = it.z>=0 ? 'var(--veg-2)' : 'var(--loss)';
+    return '<div class="z-row">'+
+      '<div>'+it.name+(isOutlier?' <span style="color:var(--loss);font-size:10px;">&#9733; outlier</span>':'')+'</div>'+
+      '<div class="z-track"><div class="z-center-line"></div><div class="z-fill" style="left:'+barLeft.toFixed(1)+'%;width:'+widthPct.toFixed(1)+'%;background:'+color+';"></div></div>'+
+      '<div class="z-val" style="color:'+color+';">'+(it.z>=0?'+':'')+it.z.toFixed(2)+'</div>'+
+    '</div>';
+  }).join('');
+
+  var topItem = items[items.length-1];
+  document.getElementById('zScoreNote').innerHTML =
+    '&mu; = '+mean.toFixed(3)+'%, &sigma; = '+sigma.toFixed(3)+'%. Aturan praktis: |z|&gt;2 dianggap outlier statistik (di luar ~95% sebaran normal). '+
+    'Hasilnya: tidak satu pun kecamatan yang loss-nya jadi outlier (semua |z|&lt;1) &mdash; variasi loss antar kecamatan masih tergolong wajar. '+
+    'Yang justru menonjol secara statistik adalah <b>'+topItem.name+'</b> dengan gain-nya (z&asymp;'+topItem.z.toFixed(2)+', di atas +2&sigma;) &mdash; '+
+    'performanya bukan kebetulan dalam sebaran normal, layak dipelajari sebagai model program penghijauan untuk kecamatan lain.';
+
+  // ---- 6. Dekomposisi Cohen's Kappa: Po (observed) vs Pe (expected/chance) ----
+  var predPos = TP+FP, predNeg = FN+TN, actPos = TP+FN, actNeg = FP+TN;
+  var Po = (TP+TN)/n;
+  var Pe = (predPos/n)*(actPos/n) + (predNeg/n)*(actNeg/n);
+  var kappaCheck = (Po-Pe)/(1-Pe);
+  var maxPoPe = Math.max(Po,Pe);
+  document.getElementById('kappaBars').innerHTML =
+    '<div class="mcnemar-col"><div class="mn-val">'+(Po*100).toFixed(1)+'%</div><div class="mcnemar-bar" style="height:'+(Po/maxPoPe*100)+'%;background:var(--veg-2);"></div><div class="mn-label">Po (Observed)</div></div>'+
+    '<div class="mcnemar-col"><div class="mn-val">'+(Pe*100).toFixed(1)+'%</div><div class="mcnemar-bar" style="height:'+(Pe/maxPoPe*100)+'%;background:var(--nonveg);"></div><div class="mn-label">Pe (Chance)</div></div>';
+  document.getElementById('kappaNote').innerHTML =
+    'Marginal prediksi positif ('+predPos+'/'+n+') dan aktual positif ('+actPos+'/'+n+') hampir seimbang, jadi baseline tebak-acak Pe&asymp;'+(Pe*100).toFixed(1)+'%. '+
+    'Kesepakatan riil model (Po='+(Po*100).toFixed(1)+'%) jauh melampauinya. Setelah dikoreksi lewat &kappa;=(Po&minus;Pe)/(1&minus;Pe), hasilnya <b>&kappa;='+kappaCheck.toFixed(3)+'</b> '+
+    '&mdash; mengonfirmasi performa model memang riil, bukan artefak distribusi kelas yang kebetulan seimbang.';
+
+}).catch(()=>console.warn('Gagal memuat data untuk analisis statistik lanjutan (Tab 4)'));
+</script>
+</body>
+</html>
