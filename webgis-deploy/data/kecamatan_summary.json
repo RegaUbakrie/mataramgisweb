@@ -1,0 +1,26 @@
+{
+  "Ampenan":{
+    "gain":17.46,
+    "loss":22.97
+  },
+  "Cakranegara":{
+    "gain":14.02,
+    "loss":20.58
+  },
+  "Mataram":{
+    "gain":14.26,
+    "loss":27.54
+  },
+  "Sandubaya":{
+    "gain":14.44,
+    "loss":30.0
+  },
+  "Sekarbela":{
+    "gain":18.17,
+    "loss":33.45
+  },
+  "Selaparang":{
+    "gain":30.57,
+    "loss":18.76
+  }
+}

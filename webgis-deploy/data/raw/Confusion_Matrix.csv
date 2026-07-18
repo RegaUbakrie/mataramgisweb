@@ -1,0 +1,2 @@
+system:index,Accuracy,F1,FN,FP,Kappa,Precision,Recall,TN,TP,.geo
+0,0.9712230215827338,0.971223021582734,2,6,0.942457956015524,0.9574468085106383,0.9854014598540146,135,135,"{""type"":""MultiPoint"",""coordinates"":[]}"
