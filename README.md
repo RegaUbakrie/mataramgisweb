@@ -88,19 +88,3 @@ kalau nomor barisnya berubah.
 | Band & indeks | B2, B3, B4, B8, B11, B12, NDVI, NDMI |
 | Split | 70:30 per kombinasi kelas × tahun, seed = 12345 |
 | Model | Random Forest, 640 trees, bagFraction 0.7 |
-
-## Tautan
-
-- Repository: `<isi>`
-- WebGIS: `<isi>`
-- Laporan akhir (PDF): `report/laporan_akhir.pdf`
-
-## Kontribusi Anggota
-
-| Nama | Kontribusi |
-|---|---|
-| Rega | WebGIS (integrasi seluruh hasil GEE ke peta interaktif) |
-| Nabila | *isi* |
-| Adrian | *isi* |
-| Femas | *isi* |
-| Abi | *isi* |
