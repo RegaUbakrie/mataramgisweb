@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Perubahan Vegetasi Kota Mataram 2024–2025 · WebGIS</title>
-<script>try{var __t=localStorage.getItem('mataram-ui-theme');if(__t&&__t!=='default'){document.documentElement.setAttribute('data-theme',__t);}}catch(e){}</script>
+<script>try{var __t=localStorage.getItem('mataram-ui-theme')||'ultra';if(__t!=='default'){document.documentElement.setAttribute('data-theme',__t);}}catch(e){}</script>
 <link rel="stylesheet" href="assets/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@
   .brand-block{display:flex;align-items:center;gap:16px;}
   .brand-logo{height:64px;width:auto;flex:none;}
   @media (max-width:560px){.brand-logo{height:48px;}}
-  .team{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);text-align:right;line-height:1.7;}
+  .team{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);text-align:right;line-height:1.7;margin-top:40px;}
   .team .k{color:var(--ink);font-weight:600;}
 
   /* ---------- DEMO BANNER ---------- */
@@ -149,6 +149,34 @@
   .card{background:var(--white);border:1px solid var(--line);padding:18px 20px;}
   .card h4{font-size:14px;font-family:'IBM Plex Sans',sans-serif;font-weight:600;margin-bottom:10px;}
   .card ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.7;color:var(--ink-soft);}
+
+  /* ---------- NEWS REFERENCE CARD (latar belakang penelitian) ---------- */
+  .news-card{margin-bottom:22px;}
+  .news-card-eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--veg-2);margin-bottom:9px;display:flex;align-items:center;gap:7px;
+  }
+  .news-card-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--veg-2);display:inline-block;}
+  .news-card-body{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;}
+  .news-card-main{flex:1;min-width:240px;}
+  .news-card-headline{
+    display:block;font-family:'Fraunces',serif;font-weight:600;font-size:19px;line-height:1.32;
+    color:var(--ink);text-decoration:none;margin-bottom:7px;
+  }
+  .news-card-headline:hover{color:var(--veg-2);}
+  .news-card-source{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);margin-bottom:12px;
+    text-transform:uppercase;letter-spacing:.04em;
+  }
+  .news-card-desc{font-size:13px;color:var(--ink-soft);line-height:1.65;margin:0 0 14px;max-width:none;}
+  .news-card-cta{
+    display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;
+    font-weight:600;color:var(--veg-2);text-decoration:none;border-bottom:1px solid var(--veg-2);padding-bottom:2px;
+  }
+  .news-card-cta:hover{opacity:.7;}
+  html[data-theme="ultra"] .news-card-headline{font-family:'Inter',sans-serif !important;font-weight:700;letter-spacing:-0.01em;}
+  html[data-theme="ultra"] .news-card-cta{border-bottom:none;background:rgba(0,113,227,.08);padding:6px 12px;border-radius:999px;}
+  html[data-theme="ultra"] .news-card-cta:hover{background:rgba(0,113,227,.16);opacity:1;}
 
   /* flow step clickable */
   .flow-step.clickable{cursor:pointer;transition:background .15s,border-color .15s,color .15s;}
@@ -254,6 +282,11 @@
     border-left:3px solid var(--veg-2);color:var(--ink-soft);margin:0 0 12px;overflow-x:auto;white-space:nowrap;
   }
   .stat-note{font-size:12px;color:var(--ink-soft);line-height:1.6;margin:10px 0 0;}
+  .formula-toggle-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;background:var(--panel);color:var(--ink-soft);
+    border:1px solid var(--line);padding:4px 9px;cursor:pointer;margin-bottom:10px;
+  }
+  .formula-toggle-btn:hover{background:var(--panel-2);color:var(--ink);}
   .stat-mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(85px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);}
   .stat-mini-card{background:var(--white);padding:10px 6px;text-align:center;}
   .stat-mini-card .v{font-family:'Fraunces',serif;font-size:17px;font-weight:600;color:var(--veg-2);}
@@ -306,118 +339,6 @@
   .theme-switch .ts-opt.active{background:#1D1D1F;color:#fff;}
   .theme-switch .ts-opt:hover:not(.active){background:rgba(0,0,0,.06);}
   @media (max-width:760px){.theme-switch{top:auto;bottom:14px;right:14px;}}
-
-  /* ================================================================
-     APPLE-STYLE CLEAN THEME — toggle via data-theme="apple" on <html>
-     ================================================================ */
-  html[data-theme="apple"]{
-    --paper:#F5F5F7; --panel:#FFFFFF; --panel-2:#F0F0F2;
-    --ink:#1D1D1F; --ink-soft:#6E6E73; --line:rgba(0,0,0,0.08);
-    --veg:#30B75A; --veg-2:#0071E3; --loss:#FF3B30; --gain:#FF9F0A;
-    --nonveg:#C7C7CC; --demo:#FF9F0A; --real:#30B75A; --white:#FFFFFF;
-  }
-  html[data-theme="apple"] body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
-  html[data-theme="apple"] nav.bands{position:sticky;top:10px;z-index:100;backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);background:rgba(245,245,247,0.82);}
-  html[data-theme="apple"] .card,html[data-theme="apple"] .stat-panel,html[data-theme="apple"] .download-card,html[data-theme="apple"] .legend-item,html[data-theme="apple"] .priority-row{transition:box-shadow .2s ease,transform .2s ease,background .2s ease;}
-  html[data-theme="apple"] .stat-card:hover,html[data-theme="apple"] .aprf-card:hover,html[data-theme="apple"] .download-card:hover{box-shadow:0 2px 4px rgba(0,0,0,.05),0 10px 26px rgba(0,0,0,.09) !important;transform:translateY(-1px);}
-  html[data-theme="apple"] body,
-  html[data-theme="apple"] h1, html[data-theme="apple"] h2,
-  html[data-theme="apple"] h3, html[data-theme="apple"] h4,
-  html[data-theme="apple"] .mono, html[data-theme="apple"] .code-viewer,
-  html[data-theme="apple"] table.spec td.mono, html[data-theme="apple"] .brand-eyebrow,
-  html[data-theme="apple"] .team, html[data-theme="apple"] footer,
-  html[data-theme="apple"] .band-btn, html[data-theme="apple"] .insight-quote,
-  html[data-theme="apple"] .formula, html[data-theme="apple"] .year-bar-row .yb-label,
-  html[data-theme="apple"] .priority-rank, html[data-theme="apple"] .z-val,
-  html[data-theme="apple"] .stat-card .v, html[data-theme="apple"] .aprf-card .v,
-  html[data-theme="apple"] .stat-mini-card .v{
-    font-family:'Inter',-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Helvetica,Arial,sans-serif !important;
-  }
-  html[data-theme="apple"] h1,html[data-theme="apple"] h2,html[data-theme="apple"] h3,html[data-theme="apple"] h4{
-    font-weight:700;letter-spacing:-0.02em;
-  }
-  html[data-theme="apple"] header.top h1 em{border-bottom:none;color:var(--veg-2);font-style:normal;}
-  html[data-theme="apple"] .insight-quote{font-style:normal;font-weight:500;font-size:18px;border-left-color:var(--veg-2);}
-  html[data-theme="apple"] ::selection{background:var(--veg-2);color:#fff;}
-
-  /* card-like surfaces: flat border -> soft shadow + generous radius */
-  html[data-theme="apple"] .card,
-  html[data-theme="apple"] .stat-card,
-  html[data-theme="apple"] .legend-panel,
-  html[data-theme="apple"] .bar-chart,
-  html[data-theme="apple"] .year-chart,
-  html[data-theme="apple"] .priority-panel,
-  html[data-theme="apple"] .stat-panel,
-  html[data-theme="apple"] .download-card,
-  html[data-theme="apple"] .aprf-card,
-  html[data-theme="apple"] .cm-wrap table.cm,
-  html[data-theme="apple"] table.spec,
-  html[data-theme="apple"] .code-panel-wrap,
-  html[data-theme="apple"] .flow-step,
-  html[data-theme="apple"] #map,
-  html[data-theme="apple"] .stat-mini-card{
-    border:none !important;
-    border-radius:18px !important;
-    box-shadow:0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.06) !important;
-  }
-  html[data-theme="apple"] .flow-step{box-shadow:0 1px 2px rgba(0,0,0,.05) !important;}
-  html[data-theme="apple"] .flow-step.clickable:hover{box-shadow:0 4px 14px rgba(0,0,0,.12) !important;}
-  html[data-theme="apple"] .flow-step.clickable.selected{box-shadow:0 4px 14px rgba(0,113,227,.35) !important;}
-  html[data-theme="apple"] .download-card{border-color:transparent !important;}
-  html[data-theme="apple"] table.spec th, html[data-theme="apple"] table.spec td,
-  html[data-theme="apple"] table.cm th, html[data-theme="apple"] table.cm td{border-color:var(--line) !important;}
-
-  /* grouped rows (grid-gap-as-divider trick): let gaps go transparent for seamless grouped look */
-  html[data-theme="apple"] .stats-row,
-  html[data-theme="apple"] .aprf-grid,
-  html[data-theme="apple"] .download-grid,
-  html[data-theme="apple"] .stat-analysis-grid,
-  html[data-theme="apple"] .stat-mini-grid{
-    background:transparent !important;border:none !important;gap:10px !important;
-  }
-
-  /* header */
-  html[data-theme="apple"] header.top{border-bottom:none;padding-top:28px;}
-  html[data-theme="apple"] .brand-eyebrow{color:var(--veg-2);}
-  html[data-theme="apple"] .brand-eyebrow .dot{background:var(--veg-2);}
-
-  /* nav tabs -> segmented control */
-  html[data-theme="apple"] nav.bands{
-    border-bottom:none;background:var(--panel-2);display:inline-flex;gap:2px;
-    padding:4px;border-radius:14px;margin:0 clamp(16px,4vw,48px) 18px;
-    width:auto;max-width:calc(100% - 2 * clamp(16px,4vw,48px));
-    overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;
-  }
-  html[data-theme="apple"] .band-btn{
-    border:none;background:transparent;top:0;border-radius:10px;padding:9px 16px;box-shadow:none;flex:none;
-  }
-  html[data-theme="apple"] .band-btn:hover{background:rgba(0,0,0,.04);}
-  html[data-theme="apple"] .band-btn.active{
-    background:var(--white);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.14);font-weight:600;
-  }
-  html[data-theme="apple"] .band-btn.active .num{color:var(--veg-2);}
-
-  /* buttons */
-  html[data-theme="apple"] .download-btn,
-  html[data-theme="apple"] .basemap-toggle button,
-  html[data-theme="apple"] .code-reset-btn,
-  html[data-theme="apple"] #btn-light, html[data-theme="apple"] #btn-sat{
-    border-radius:10px !important;border:none !important;font-weight:600;
-  }
-  html[data-theme="apple"] .download-btn{background:var(--veg-2) !important;border-color:var(--veg-2) !important;}
-  html[data-theme="apple"] .download-btn:hover{background:#0059B3 !important;}
-  html[data-theme="apple"] .basemap-toggle button{background:var(--panel-2);color:var(--ink-soft);}
-  html[data-theme="apple"] .basemap-toggle button.active{background:var(--veg-2) !important;border-color:var(--veg-2) !important;}
-  html[data-theme="apple"] .code-reset-btn{border:1px solid rgba(255,255,255,.18) !important;}
-
-  /* legend + priority rows: no hairlines, subtle hover */
-  html[data-theme="apple"] .legend-item{border-bottom:none;border-radius:10px;padding:8px 8px;}
-  html[data-theme="apple"] .legend-item:hover{background:var(--panel-2);}
-  html[data-theme="apple"] .priority-row{border-bottom:none;border-radius:12px;margin-bottom:2px;}
-  html[data-theme="apple"] .priority-row:hover{background:var(--panel-2);}
-
-  html[data-theme="apple"] .leaflet-control-zoom a{border-radius:8px !important;}
-  html[data-theme="apple"] .leaflet-control-zoom{border-radius:10px !important;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.14) !important;}
 
   footer, .card, .stat-card{transition:box-shadow .25s ease, border-radius .25s ease, background .25s ease;}
 
@@ -641,7 +562,6 @@
 
 <div class="theme-switch" id="themeSwitch" role="tablist" aria-label="Tema tampilan">
   <button type="button" class="ts-opt" data-theme-value="default">Editorial</button>
-  <button type="button" class="ts-opt" data-theme-value="apple">Clean</button>
   <button type="button" class="ts-opt" data-theme-value="ultra">Ultra</button>
 </div>
 
@@ -654,7 +574,7 @@
     </div>
   </div>
   <div class="team">
-    Nabila &middot; Adrian &middot; Femas &middot; Abi &middot; <span class="k">Rega</span><br>
+    Nabila &middot; Femas &middot; Fari &middot; Adrian &middot; Rega<br>
     Sentinel-2 &middot; Random Forest &middot; WebGIS 4-Tab<br>
     Periode 2024&ndash;2025
   </div>
@@ -671,21 +591,29 @@
 
   <!-- ============ TAB 1: PETA HASIL ============ -->
   <section class="tabpanel active" id="tab-1">
-    <div class="section-label">Instruksi 4 &middot; Tab 1</div>
-    <h2>Peta Hasil &mdash; Kota Mataram, Objek Target: Vegetasi</h2>
+    <h2>Peta Perubahan Vegetasi Kota Mataram</h2>
 
-    <div class="insight-quote">
-      &ldquo;Dalam satu tahun, Kota Mataram kehilangan lebih banyak vegetasi (202,35 ha) daripada yang berhasil
-      ditambahkan (139,66 ha) &mdash; net <b>&minus;62,69 ha (&minus;2,33%)</b>. <b>Sekarbela</b> jadi titik loss
-      tertinggi (&plusmn;33 ha), sementara <b>Selaparang</b> justru mencatat gain tertinggi (&plusmn;31 ha).
-      Model klasifikasi mendukung temuan ini dengan akurasi 97,1% (Kappa 0,942) &mdash; lihat Tab 03 &amp; 04
-      untuk evaluasi lengkap dan interpretasinya.&rdquo;
+    <div class="card news-card">
+      <div class="news-card-eyebrow"><span class="dot"></span>Latar Belakang Penelitian</div>
+      <div class="news-card-body">
+        <div class="news-card-main">
+          <a class="news-card-headline" href="https://lombokpost.jawapos.com/mataram/1503213825/20-persen-ruang-terbuka-hijau-di-kota-mataram-sulit-dipenuhi" target="_blank" rel="noopener noreferrer">
+            20 Persen Ruang Terbuka Hijau di Kota Mataram Sulit Dipenuhi
+          </a>
+          <div class="news-card-source">Lombok Post &middot; lombokpost.jawapos.com</div>
+          <p class="news-card-desc">
+            Pemberitaan ini menyoroti tantangan Kota Mataram dalam memenuhi target ruang terbuka hijau (RTH) di tengah tekanan pembangunan dan alih fungsi lahan. Isu inilah yang melatarbelakangi penelitian ini, yang memetakan perubahan tutupan vegetasi Kota Mataram tahun 2024&ndash;2025 secara spasial berbasis citra satelit, sebagai data pendukung untuk evaluasi capaian RTH kota.
+          </p>
+          <a class="news-card-cta" href="https://lombokpost.jawapos.com/mataram/1503213825/20-persen-ruang-terbuka-hijau-di-kota-mataram-sulit-dipenuhi" target="_blank" rel="noopener noreferrer">Baca artikel asli &rarr;</a>
+        </div>
+      </div>
     </div>
 
+
     <div class="year-chart">
-      <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);margin-bottom:2px;">Luas Vegetasi &mdash; 2024 vs 2025</h4>
+      <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);margin-bottom:2px;">Perbandingan Luas Vegetasi Tahun 2024 dan 2025</h4>
       <div id="yearBars"><!-- filled by JS --></div>
-      <div class="chart-hint">Klik salah satu bar untuk tampilkan/sembunyikan layer-nya di peta &middot; arahkan kursor ke bar untuk lihat detail.</div>
+      <div class="chart-hint">Klik batang tahun 2024 atau 2025 untuk menampilkan atau menyembunyikan layer pada peta. Arahkan kursor ke batang untuk melihat informasi lebih detail.</div>
     </div>
 
     <div class="stats-row" id="statsRow"><!-- filled by JS --></div>
@@ -694,12 +622,12 @@
       <div class="legend-panel">
         <h4>Layer</h4>
         <div class="legend-item" data-layer="batas"><span class="legend-swatch" style="background:none;border:2px solid #A8452E;"></span> Batas Kota Mataram <input type="checkbox" checked></div>
-        <div class="legend-item" data-layer="priority"><span class="legend-swatch" style="background:linear-gradient(135deg,#A8452E,#C99A3D,#2F6B4F);border-radius:50%;"></span> Prioritas Tindakan (rank 1&ndash;6) <input type="checkbox" checked></div>
+        <div class="legend-item" data-layer="priority"><span class="legend-swatch" style="background:linear-gradient(135deg,#A8452E,#C99A3D,#2F6B4F);border-radius:50%;"></span> Prioritas Penanganan (rank 1&ndash;6) <input type="checkbox" checked></div>
         <div class="legend-item" data-layer="kecamatan"><span class="legend-swatch" style="background:linear-gradient(90deg,#2F6B4F 50%,#A8452E 50%);border:1px dashed #4A5A4E;"></span> Kecamatan (bertambah/berkurang) <input type="checkbox"></div>
-        <div class="legend-item" data-layer="t24"><span class="legend-swatch" style="background:#4A90C4;"></span> Target Vegetasi 2024 <input type="checkbox" checked></div>
-        <div class="legend-item" data-layer="t25"><span class="legend-swatch" style="background:#2F6B4F;"></span> Target Vegetasi 2025 <input type="checkbox"></div>
-        <div class="legend-item" data-layer="gain"><span class="legend-swatch" style="background:#C99A3D;"></span> Gain (0&rarr;1) <input type="checkbox" checked></div>
-        <div class="legend-item" data-layer="loss"><span class="legend-swatch" style="background:#A8452E;"></span> Loss (1&rarr;0) <input type="checkbox" checked></div>
+        <div class="legend-item" data-layer="t24"><span class="legend-swatch" style="background:#4A90C4;"></span> Vegetasi 2024 <input type="checkbox" checked></div>
+        <div class="legend-item" data-layer="t25"><span class="legend-swatch" style="background:#2F6B4F;"></span> Vegetasi 2025 <input type="checkbox"></div>
+        <div class="legend-item" data-layer="gain"><span class="legend-swatch" style="background:#C99A3D;"></span> Penambahan Vegetasi <input type="checkbox" checked></div>
+        <div class="legend-item" data-layer="loss"><span class="legend-swatch" style="background:#A8452E;"></span> Kehilangan Vegetasi <input type="checkbox" checked></div>
         <div class="legend-item" data-layer="gt"><span class="legend-swatch" style="background:none;border-radius:50%;border:2px solid #2F6B4F;"></span> Titik Ground Truth (640) <input type="checkbox"></div>
 
         <h4 style="margin-top:18px;">Basemap</h4>
@@ -713,13 +641,20 @@
       </div>
       <div id="map"></div>
     </div>
+    <div class="insight-quote">
+      &ldquo;Selama periode 2024&ndash;2025, luas vegetasi Kota Mataram menurun sebesar <b>62,69 ha</b> atau
+      <b>2,33%</b>. Penambahan vegetasi mencapai 139,66 ha, sedangkan kehilangan vegetasi tercatat lebih besar,
+      yaitu 202,35 ha. Kehilangan vegetasi tertinggi terjadi di Kecamatan <b>Sekarbela</b>, sementara penambahan
+      terbesar ditemukan di Kecamatan <b>Selaparang</b>. Hasil ini didukung oleh model klasifikasi dengan akurasi
+      <b>97,1%</b> dan nilai Kappa <b>0,942</b>.&rdquo;
+    </div>
 
     <div class="priority-panel">
-      <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);margin-bottom:4px;">Prioritas Tindakan per Kecamatan</h4>
+      <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);margin-bottom:4px;">Prioritas Penanganan per Kecamatan</h4>
       <p style="font-size:11.5px;color:var(--ink-soft);margin:0 0 14px;line-height:1.6;">
-        Diurutkan dari yang paling perlu perhatian ke yang paling terjaga, berdasarkan net perubahan vegetasi
-        (gain&minus;loss) terhadap luas kecamatan &mdash; angka yang sama seperti pada badge bernomor di peta.
-        Klik salah satu baris untuk langsung fokus ke kecamatan tersebut di peta.
+        Kecamatan diurutkan dari yang paling membutuhkan perhatian hingga yang kondisi vegetasinya paling terjaga.
+        Urutan ditentukan berdasarkan perubahan bersih vegetasi terhadap luas kecamatan. Klik salah satu baris
+        untuk melihat lokasinya pada peta.
       </p>
       <div id="priorityList"><!-- filled by JS --></div>
     </div>
@@ -727,8 +662,7 @@
 
   <!-- ============ TAB 2: DATA & PROSES ============ -->
   <section class="tabpanel" id="tab-2">
-    <div class="section-label">Instruksi 4 &middot; Tab 2</div>
-    <h2>Data &amp; Proses &mdash; Transparansi Metodologi</h2>
+    <h2>Data dan Proses Analisis &mdash; Transparansi Metodologi</h2>
 
     <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:8px;">Klik salah satu tahap untuk lompat &amp; sorot bagian kode yang sesuai di panel di bawah.</p>
     <div class="flow" id="flowDiagram">
@@ -772,28 +706,27 @@
     </div>
 
     <div class="card" style="margin-bottom:28px;">
-      <h4>Unduh Data Mentah &mdash; Transparansi</h4>
+      <h4>Unduh Data dan Kode Analisis</h4>
       <p style="font-size:12.5px;color:var(--ink-soft);margin:-4px 0 4px;line-height:1.6;">
-        Semua layer yang dipakai peta di Tab 01 &mdash; dan skrip GEE lengkap yang menghasilkannya &mdash; bisa diunduh
-        langsung di sini, tanpa perlu akses ke Google Earth Engine, supaya siapa pun bisa memverifikasi atau
-        memakai ulang datanya.
+        Seluruh data yang digunakan pada peta di Tab 01, beserta skrip analisisnya, dapat diunduh langsung di sini.
+        Data dan skrip analisis disediakan agar proses penelitian dapat diperiksa dan direplikasi.
       </p>
       <div class="download-grid">
         <div class="download-card" style="border-color:#9FC7A8;">
           <div class="dc-name">Confusion_Matrix.csv</div>
-          <div class="dc-desc">Confusion matrix mentah hasil <span class="mono" style="font-size:11px;">errorMatrix()</span> GEE (TN/FP/FN/TP, Accuracy, Precision, Recall, F1, Kappa) &mdash; sumber angka di Tab 03.</div>
+          <div class="dc-desc">Confusion matrix hasil evaluasi model klasifikasi (TN, FP, FN, TP) beserta metrik Akurasi, Precision, Recall, F1-Score, dan Koefisien Kappa &mdash; sumber angka pada Tab 03.</div>
           <div class="dc-meta">CSV &middot; &asymp;1 KB</div>
           <a class="download-btn" href="data/raw/Confusion_Matrix.csv" download>&darr; Unduh</a>
         </div>
         <div class="download-card" style="border-color:#9FC7A8;">
           <div class="dc-name">Summary_Statistik_Mataram_2024_2025.csv</div>
-          <div class="dc-desc">Ringkasan luas vegetasi 2024/2025, gain/loss, net change, dan akurasi model &mdash; sumber angka di Tab 01 &amp; 04.</div>
+          <div class="dc-desc">Ringkasan luas vegetasi 2024/2025, penambahan/kehilangan vegetasi, perubahan bersih, dan akurasi model &mdash; sumber angka pada Tab 01 &amp; 04.</div>
           <div class="dc-meta">CSV &middot; &asymp;1 KB</div>
           <a class="download-btn" href="data/raw/Summary_Statistik_Mataram_2024_2025.csv" download>&darr; Unduh</a>
         </div>
         <div class="download-card" style="border-color:#9FC7A8;">
           <div class="dc-name">ground_truth_mataram_2024_2025.csv</div>
-          <div class="dc-desc">640 titik ground truth mentah (longitude, latitude, class, year) langsung dari export GEE, sebelum dikonversi ke GeoJSON.</div>
+          <div class="dc-desc">640 titik ground truth (longitude, latitude, kelas, tahun) sebelum dikonversi ke format GeoJSON.</div>
           <div class="dc-meta">CSV &middot; &asymp;28 KB</div>
           <a class="download-btn" href="data/raw/ground_truth_mataram_2024_2025.csv" download>&darr; Unduh</a>
         </div>
@@ -811,31 +744,31 @@
         </div>
         <div class="download-card">
           <div class="dc-name">kecamatan_summary.json</div>
-          <div class="dc-desc">Ringkasan gain/loss (ha) per kecamatan, sumber panel Prioritas Tindakan.</div>
+          <div class="dc-desc">Ringkasan penambahan dan kehilangan vegetasi (ha) per kecamatan, sumber panel Prioritas Penanganan.</div>
           <div class="dc-meta">JSON &middot; &asymp;1 KB</div>
           <a class="download-btn" href="data/kecamatan_summary.json" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">target_2024.geojson</div>
-          <div class="dc-desc">Poligon tutupan vegetasi hasil klasifikasi 2024 (divectorize dari raster RF_2024, MMU &plusmn;0,2 ha).</div>
+          <div class="dc-desc">Poligon tutupan vegetasi hasil klasifikasi tahun 2024 (satuan pemetaan minimum &plusmn;0,2 ha).</div>
           <div class="dc-meta">GeoJSON &middot; &asymp;751 KB</div>
           <a class="download-btn" href="data/target_2024.geojson" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">target_2025.geojson</div>
-          <div class="dc-desc">Poligon tutupan vegetasi hasil klasifikasi 2025, metode sama dengan 2024.</div>
+          <div class="dc-desc">Poligon tutupan vegetasi hasil klasifikasi tahun 2025, dengan metode yang sama seperti tahun 2024.</div>
           <div class="dc-meta">GeoJSON &middot; &asymp;736 KB</div>
           <a class="download-btn" href="data/target_2025.geojson" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">gain.geojson</div>
-          <div class="dc-desc">Poligon area yang berubah dari non-vegetasi ke vegetasi (0&rarr;1) antara 2024&ndash;2025.</div>
+          <div class="dc-desc">Poligon area yang berubah dari nonvegetasi menjadi vegetasi antara tahun 2024&ndash;2025.</div>
           <div class="dc-meta">GeoJSON &middot; &asymp;806 KB</div>
           <a class="download-btn" href="data/gain.geojson" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">loss.geojson</div>
-          <div class="dc-desc">Poligon area yang berubah dari vegetasi ke non-vegetasi (1&rarr;0) antara 2024&ndash;2025.</div>
+          <div class="dc-desc">Poligon area yang berubah dari vegetasi menjadi nonvegetasi antara tahun 2024&ndash;2025.</div>
           <div class="dc-meta">GeoJSON &middot; &asymp;1,07 MB</div>
           <a class="download-btn" href="data/loss.geojson" download>&darr; Unduh</a>
         </div>
@@ -847,13 +780,13 @@
         </div>
         <div class="download-card">
           <div class="dc-name">stats.json</div>
-          <div class="dc-desc">Statistik ringkasan kota: luas, persentase vegetasi, gain/loss, confusion matrix &amp; APRF.</div>
+          <div class="dc-desc">Statistik ringkasan kota: luas wilayah, persentase vegetasi, penambahan/kehilangan vegetasi, confusion matrix, dan metrik evaluasi model.</div>
           <div class="dc-meta">JSON &middot; &asymp;1 KB</div>
           <a class="download-btn" href="data/stats.json" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">main_script.js</div>
-          <div class="dc-desc">Skrip lengkap Google Earth Engine (preprocessing sampai export) yang ditampilkan di panel kode di atas.</div>
+          <div class="dc-desc">Skrip lengkap Google Earth Engine yang digunakan untuk seluruh tahapan analisis, dari praproses hingga ekspor data, sesuai yang ditampilkan pada panel kode di atas.</div>
           <div class="dc-meta">JavaScript &middot; &asymp;25 KB</div>
           <a class="download-btn" href="assets/main_script.js" download>&darr; Unduh</a>
         </div>
@@ -862,21 +795,19 @@
 
     <div class="two-col">
       <div class="card">
-        <h4>Ground truth &amp; sampling</h4>
+        <h4>Ground Truth dan Pengambilan Sampel</h4>
         <ul>
-          <li>Kelas 1 = vegetasi, kelas 0 = bukan vegetasi &mdash; dibuat terpisah untuk 2024 dan 2025.</li>
-          <li>Target rencana: 400 observasi (100 target 2024, 100 nontarget 2024, 100 target 2025, 100 nontarget 2025), di atas minimum soal 300.</li>
-          <li>Sebaran direncanakan merata di 6 kecamatan: Ampenan, Mataram, Cakranegara, Sekarbela, Selaparang, Sandubaya &mdash; mewakili pusat kota padat dan pinggiran yang masih hijau.</li>
-          <li>Digitasi manual per titik/polygon berdasarkan interpretasi citra RGB &amp; NDVI, tidak menyalin label 2024 ke 2025 tanpa cek ulang.</li>
+          <li>Kelas 1 = vegetasi, kelas 0 = nonvegetasi &mdash; dibuat terpisah untuk tahun 2024 dan 2025.</li>
+          <li>Target awal pengambilan sampel adalah 400 observasi (100 vegetasi 2024, 100 nonvegetasi 2024, 100 vegetasi 2025, 100 nonvegetasi 2025), di atas ketentuan minimum sebanyak 300 titik. Pada pelaksanaannya, jumlah titik ground truth yang berhasil dikumpulkan mencapai 640 titik.</li>
+          <li>Sebaran merata di 6 kecamatan: Ampenan, Mataram, Cakranegara, Sekarbela, Selaparang, dan Sandubaya &mdash; mewakili wilayah pusat kota yang padat maupun pinggiran yang masih hijau.</li>
+          <li>Digitasi dilakukan secara manual per titik berdasarkan interpretasi citra RGB dan NDVI, tanpa menyalin label tahun 2024 ke tahun 2025 tanpa verifikasi ulang.</li>
         </ul>
       </div>
       <div class="card">
-        <h4>Status ekspor &amp; yang masih perlu dirapikan</h4>
+        <h4>Ketersediaan Data Hasil Analisis</h4>
         <ul>
-          <li>✓ Change detection (4 kondisi), gain/loss vector, raster klasifikasi, dan CSV ringkasan <b>sudah</b> diekspor oleh Part 7&ndash;10 (lihat panel kode di bawah).</li>
-          <li>Gain/Loss saat ini diekspor sebagai <span class="mono" style="font-size:12px;">SHP</span>, sedangkan WebGIS ini butuh <span class="mono" style="font-size:12px;">GeoJSON</span> &mdash; konversi cepat lewat <a href="https://mapshaper.org" target="_blank" style="color:var(--veg-2);">mapshaper.org</a> (drag shp+dbf+shx, export as GeoJSON) atau <span class="mono" style="font-size:12px;">ogr2ogr -f GeoJSON out.geojson in.shp</span>.</li>
-          <li>Belum ada vectorize khusus untuk <span class="mono" style="font-size:12px;">target_2024</span> &amp; <span class="mono" style="font-size:12px;">target_2025</span> (baru raster) &mdash; tambahkan <span class="mono" style="font-size:12px;">reduceToVectors</span> pada <span class="mono" style="font-size:12px;">classified2024.eq(1)</span> dan <span class="mono" style="font-size:12px;">classified2025.eq(1)</span> lalu export GeoJSON.</li>
-          <li>Setelah 4 file GeoJSON siap, timpa file dengan nama sama di <span class="mono" style="font-size:12px;">webgis/data/</span>.</li>
+          <li>Seluruh hasil analisis &mdash; deteksi perubahan, poligon penambahan dan kehilangan vegetasi, raster klasifikasi, serta ringkasan statistik &mdash; telah tersedia dan dapat diunduh pada bagian di atas.</li>
+          <li>Data disediakan dalam format GeoJSON dan CSV agar dapat langsung digunakan untuk keperluan verifikasi maupun analisis lanjutan tanpa memerlukan perangkat lunak khusus.</li>
         </ul>
       </div>
     </div>
@@ -884,33 +815,32 @@
 
   <!-- ============ TAB 3: EVALUASI MODEL ============ -->
   <section class="tabpanel" id="tab-3">
-    <div class="section-label">Instruksi 4 &middot; Tab 3</div>
     <h2>Evaluasi Model</h2>
-    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-10px;margin-bottom:18px;">Dihitung dari <span class="mono">testingData.classify(rf).errorMatrix()</span> di GEE &mdash; lihat panel kode di Tab 2, bagian <span class="mono">06 Evaluasi</span>.</p>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-10px;margin-bottom:18px;">Model dievaluasi menggunakan data testing melalui confusion matrix dan metrik akurasi. Tahapan lengkap proses evaluasi dapat ditelusuri pada Tab 02, bagian 06 Evaluasi.</p>
 
     <div class="cm-wrap">
       <div>
-        <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);margin-bottom:10px;">Confusion Matrix (testing, n=278)</h4>
+        <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);margin-bottom:10px;">Confusion Matrix (Data Testing, n=278)</h4>
         <div class="table-scroll">
         <table class="cm">
-          <tr><th></th><th>Prediksi: Non-Veg</th><th>Prediksi: Vegetasi</th></tr>
-          <tr><th>Aktual: Non-Veg</th><td class="tn">TN = 135</td><td class="fp">FP = 6</td></tr>
+          <tr><th></th><th>Prediksi: Nonvegetasi</th><th>Prediksi: Vegetasi</th></tr>
+          <tr><th>Aktual: Nonvegetasi</th><td class="tn">TN = 135</td><td class="fp">FP = 6</td></tr>
           <tr><th>Aktual: Vegetasi</th><td class="fn">FN = 2</td><td class="tp">TP = 135</td></tr>
         </table>
         </div>
         <p style="font-size:11.5px;color:var(--ink-soft);margin-top:10px;max-width:280px;line-height:1.6;">
-          Ground truth 640 titik (160 per kombinasi kelas&times;tahun). Confusion matrix dihitung dari
-          <span class="mono" style="font-size:11px;">errorMatrix()</span> atas sampel yang berhasil di-resample ke
-          feature stack (tidak tertutup awan/nodata), n=278 &mdash; data mentahnya bisa diunduh sebagai
-          <span class="mono" style="font-size:11px;">Confusion_Matrix.csv</span> di Tab 02.
+          Ground truth berjumlah 640 titik (160 per kombinasi kelas dan tahun). Confusion matrix dihitung dari
+          278 sampel testing yang berhasil digunakan dalam evaluasi (sebagian titik tidak terpakai karena tertutup
+          awan atau data kosong). Data lengkapnya dapat diunduh sebagai
+          <span class="mono" style="font-size:11px;">Confusion_Matrix.csv</span> pada Tab 02.
         </p>
       </div>
       <div class="aprf-grid">
-        <div class="aprf-card"><div class="v">97.1%</div><div class="l">Accuracy</div></div>
-        <div class="aprf-card"><div class="v">95.7%</div><div class="l">Precision (kelas 1)</div></div>
-        <div class="aprf-card"><div class="v">98.5%</div><div class="l">Recall (kelas 1)</div></div>
-        <div class="aprf-card"><div class="v">97.1%</div><div class="l">F1-score (kelas 1)</div></div>
-        <div class="aprf-card"><div class="v">0.942</div><div class="l">Kappa</div></div>
+        <div class="aprf-card"><div class="v">97.1%</div><div class="l">Akurasi</div></div>
+        <div class="aprf-card"><div class="v">95.7%</div><div class="l">Presisi Vegetasi</div></div>
+        <div class="aprf-card"><div class="v">98.5%</div><div class="l">Recall Vegetasi</div></div>
+        <div class="aprf-card"><div class="v">97.1%</div><div class="l">F1-Score Vegetasi</div></div>
+        <div class="aprf-card"><div class="v">0.942</div><div class="l">Koefisien Kappa</div></div>
       </div>
     </div>
 
@@ -918,20 +848,21 @@
       <div class="card">
         <h4>Interpretasi pola kesalahan</h4>
         <ul>
-          <li>Model tetap sangat akurat pada data testing: hanya <b>8 kesalahan dari 278 sampel</b> (6 false positive, 2 false negative).</li>
-          <li><b>6 False Positive</b> &mdash; lahan non-vegetasi yang terklasifikasi sebagai vegetasi, kemungkinan lahan kosong/sawah kering dengan NDVI menengah yang mirip vegetasi jarang.</li>
-          <li><b>2 False Negative</b> &mdash; titik vegetasi tipis/kecil yang piksel 10&nbsp;m-nya bercampur dengan tutupan non-vegetasi di sekitarnya (mixed pixel).</li>
-          <li>Precision (95,7%) sedikit lebih rendah dari Recall (98,5%) &mdash; model punya kecenderungan ringan meng-overestimate luas vegetasi (lebih banyak false positive daripada false negative), meski keduanya tetap tinggi.</li>
-          <li>Kappa 0,942 (mendekati 1) tetap mengonfirmasi kesepakatan model dengan ground truth jauh di atas kebetulan acak.</li>
+          <li>Model tetap sangat akurat pada data testing: hanya <b>8 kesalahan dari 278 sampel</b> (6 False Positive, 2 False Negative).</li>
+          <li><b>6 False Positive</b> &mdash; lahan nonvegetasi yang terklasifikasi sebagai vegetasi, kemungkinan lahan kosong atau sawah kering dengan nilai NDVI menengah yang mirip vegetasi jarang.</li>
+          <li><b>2 False Negative</b> &mdash; titik vegetasi tipis atau kecil yang piksel 10&nbsp;m-nya bercampur dengan tutupan nonvegetasi di sekitarnya.</li>
+          <li>Presisi (95,7%) sedikit lebih rendah dari Recall (98,5%) &mdash; model memiliki kecenderungan ringan mengoverestimasi luas vegetasi (lebih banyak False Positive daripada False Negative), meski keduanya tetap tinggi.</li>
+          <li>Koefisien Kappa 0,942 (mendekati 1) mengonfirmasi kesepakatan model dengan ground truth jauh di atas tingkat kebetulan acak.</li>
         </ul>
       </div>
       <div class="card">
         <h4>Keterbatasan</h4>
         <ul>
-          <li>Akurasi setinggi ini bisa terjadi karena ground truth diambil dari interpreter yang sama dan pada citra yang relatif bersih (cloud &lt; 20%) &mdash; performa di piksel batas/transisi kelas di lapangan bisa lebih rendah dari yang terukur di testing set.</li>
-          <li>Sebagian titik ground truth tidak terpakai dalam confusion matrix karena tertutup mask awan/nodata saat di-sample ke feature stack &mdash; area bertutupan awan persisten berpotensi kurang terwakili dalam evaluasi.</li>
-          <li>Resolusi 10 m tidak menangkap vegetasi individual sangat kecil (pohon tunggal, kebun sempit &lt; 100 m&sup2;).</li>
-          <li>Perbedaan musiman antara tanggal akuisisi 2024 dan 2025 (di luar kontrol composite median tahunan) dapat menambah noise pada NDVI di lahan pertanian musiman.</li>
+          <li>Akurasi yang tinggi ini turut dipengaruhi oleh ground truth yang diambil dari interpreter yang sama dan pada citra yang relatif bersih (tutupan awan &lt; 20%), sehingga performa pada piksel batas atau transisi kelas di lapangan berpotensi lebih rendah dibandingkan yang terukur pada data testing.</li>
+          <li>Sebagian titik ground truth tidak terpakai dalam confusion matrix karena tertutup awan atau data kosong, sehingga area dengan tutupan awan persisten berpotensi kurang terwakili dalam evaluasi.</li>
+          <li>Resolusi 10 m belum dapat menangkap vegetasi individual berukuran sangat kecil (pohon tunggal, kebun sempit &lt; 100 m&sup2;).</li>
+          <li>Perbedaan waktu akuisisi citra antara tahun 2024 dan 2025 berpotensi menambah variasi nilai NDVI pada lahan pertanian musiman.</li>
+          <li>Validasi lapangan tetap diperlukan untuk memastikan hasil klasifikasi konsisten dengan kondisi aktual di lapangan.</li>
         </ul>
       </div>
     </div>
@@ -939,91 +870,99 @@
 
   <!-- ============ TAB 4: INSIGHT HASIL ============ -->
   <section class="tabpanel" id="tab-4">
-    <div class="section-label">Instruksi 4 &middot; Tab 4</div>
-    <h2>Insight Hasil <span style="font-size:13px;font-family:'IBM Plex Mono',monospace;color:var(--demo);vertical-align:middle;">&nbsp;&mdash; berdasar data contoh</span></h2>
+    <h2>Insight Hasil Analisis</h2>
 
     <div class="insight-quote">
-      &ldquo;Datanya tidak menunjukkan bencana, tapi tren yang konsisten: dalam satu tahun Mataram kehilangan lebih banyak vegetasi daripada yang berhasil ditambahkan &mdash; dan itu cukup untuk membuat target 30% RTH makin jauh, bukan makin dekat.&rdquo;
+      &ldquo;Data menunjukkan tren yang konsisten: dalam satu tahun, Kota Mataram kehilangan vegetasi lebih banyak daripada yang berhasil ditambahkan, sehingga capaian target 30% ruang terbuka hijau (RTH) belum menunjukkan perbaikan.&rdquo;
     </div>
 
     <div class="stats-row" id="statsRow2"><!-- filled by JS --></div>
 
     <div class="bar-chart">
-      <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);margin-bottom:14px;">Gain vs Loss Vegetasi per Kecamatan (ha)</h4>
+      <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);margin-bottom:14px;">Penambahan dan Kehilangan Vegetasi per Kecamatan (ha)</h4>
       <div id="kecBars"></div>
     </div>
 
     <div class="two-col">
       <div class="card">
-        <h4>Kemungkinan penyebab (interpretasi hati-hati)</h4>
+        <h4>Kemungkinan Faktor yang Memengaruhi</h4>
         <ul>
-          <li>Loss (202,35 ha) hampir 1,45&times; lebih besar dari gain (139,66 ha) &mdash; polanya bukan kehilangan masif, tapi erosi bertahap yang konsisten dengan keluhan Bappeda soal sulitnya memenuhi target 30% RTH.</li>
-          <li><b>Sekarbela</b> mencatat loss tertinggi (&plusmn;33 ha) dan <b>Mataram</b> (kecamatan pusat kota) loss kedua tertinggi (&plusmn;28 ha) meski wilayahnya relatif kecil &mdash; sejalan dengan tekanan pembangunan di pusat kota.</li>
-          <li>Menariknya <b>Selaparang</b> mencatat gain tertinggi (&plusmn;31 ha) sekaligus loss terendah &mdash; kemungkinan efek program penghijauan lokal atau lahan yang sebelumnya terbuka mulai ditumbuhi vegetasi sekunder.</li>
-          <li>Ini adalah pola korelatif dari citra satelit pada resolusi 10 m, bukan bukti kausal &mdash; perlu verifikasi lapangan sebelum dijadikan dasar kebijakan definitif.</li>
+          <li>Kehilangan vegetasi (202,35 ha) tercatat sekitar 1,45 kali lebih besar dibandingkan penambahan vegetasi (139,66 ha). Pola ini menunjukkan penurunan vegetasi secara bertahap, sejalan dengan tantangan pemenuhan target 30% ruang terbuka hijau (RTH) di Kota Mataram.</li>
+          <li>Kecamatan <b>Sekarbela</b> mencatat kehilangan vegetasi tertinggi (&plusmn;33 ha), diikuti Kecamatan <b>Mataram</b> (&plusmn;28 ha) yang merupakan kawasan pusat kota dengan luas wilayah relatif kecil &mdash; kondisi ini sejalan dengan tingginya tekanan pembangunan di pusat kota.</li>
+          <li>Kecamatan <b>Selaparang</b> mencatat penambahan vegetasi tertinggi (&plusmn;31 ha) sekaligus kehilangan vegetasi terendah di antara seluruh kecamatan &mdash; kemungkinan dipengaruhi oleh program penghijauan lokal atau lahan terbuka yang mulai ditumbuhi vegetasi sekunder.</li>
+          <li>Temuan ini merupakan interpretasi berdasarkan citra satelit resolusi 10 m dan bersifat korelatif, bukan kausal. Verifikasi lapangan tetap diperlukan sebelum dijadikan dasar kebijakan.</li>
         </ul>
       </div>
       <div class="card">
-        <h4>Potensi penggunaan &amp; rekomendasi</h4>
+        <h4>Potensi Pemanfaatan &amp; Rekomendasi</h4>
         <ul>
-          <li><b>Pengguna potensial:</b> Dinas Lingkungan Hidup &amp; Bappeda (evaluasi RDTR &amp; target RTH 30%), akademisi, warga.</li>
-          <li><b>Rekomendasi:</b> monitoring berkala tiap musim kemarau, ground-truthing di kecamatan dengan loss tertinggi, integrasi dengan data RTH resmi kota.</li>
-          <li><b>Keterbatasan:</b> hasil bergantung kualitas ground truth &amp; ambang cloud &mdash; lihat Tab 3 untuk detail.</li>
+          <li><b>Pengguna potensial:</b> Dinas Lingkungan Hidup (DLH), Bappeda (evaluasi RDTR dan target RTH 30%), akademisi/peneliti, serta masyarakat umum.</li>
+          <li><b>Rekomendasi:</b> pemantauan vegetasi secara berkala terutama pada musim kemarau, validasi lapangan pada kecamatan dengan kehilangan vegetasi tertinggi, serta pembandingan dengan data RTH resmi milik pemerintah kota.</li>
+          <li><b>Keterbatasan:</b> hasil analisis bergantung pada kualitas ground truth dan ambang batas tutupan awan yang digunakan &mdash; lihat Tab 03 untuk detail lengkap.</li>
         </ul>
       </div>
     </div>
 
     <div class="section-label" style="margin-top:36px;">Analisis Lanjutan</div>
-    <h3 style="font-family:'Fraunces',serif;font-size:20px;margin-bottom:6px;">Uji Statistik &amp; Dekomposisi Perubahan</h3>
+    <h3 style="font-family:'Fraunces',serif;font-size:20px;margin-bottom:6px;">Analisis Statistik dan Pola Perubahan</h3>
     <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 18px;line-height:1.6;max-width:860px;">
-      Bagian di bawah bukan sekadar rekap angka &mdash; tapi pengujian statistik formal atas confusion matrix
-      dan dekomposisi perubahan lahan, supaya klaim &ldquo;vegetasi berkurang&rdquo; punya dasar kuantitatif
-      yang bisa diuji ulang, bukan cuma pembacaan visual dari peta. Semua dihitung langsung dari
-      <span class="mono" style="font-size:11.5px;">stats.json</span> &amp;
-      <span class="mono" style="font-size:11.5px;">kecamatan_summary.json</span> di sisi klien &mdash; ganti datanya, angka &amp; visualisasi di bawah ikut berubah.
+      Bagian ini menyajikan pengujian statistik formal atas confusion matrix dan dekomposisi perubahan lahan,
+      sehingga temuan &ldquo;vegetasi berkurang&rdquo; memiliki dasar kuantitatif yang dapat diuji ulang, bukan
+      sekadar pembacaan visual dari peta. Rumus perhitungan masing-masing analisis dapat dilihat lewat tombol
+      &ldquo;Lihat Rumus&rdquo; pada setiap panel.
     </p>
 
+    <div class="section-label" style="margin-top:8px;">Keandalan Model</div>
     <div class="stat-analysis-grid">
       <div class="stat-panel">
         <h4>1. Metrik Turunan Confusion Matrix</h4>
-        <div class="formula">Specificity=TN/(TN+FP) &middot; NPV=TN/(TN+FN) &middot; MCC=(TP&middot;TN&minus;FP&middot;FN)/&radic;((TP+FP)(TP+FN)(TN+FP)(TN+FN))</div>
+        <button type="button" class="formula-toggle-btn">Lihat Rumus</button>
+        <div class="formula" hidden>Specificity=TN/(TN+FP) &middot; NPV=TN/(TN+FN) &middot; MCC=(TP&middot;TN&minus;FP&middot;FN)/&radic;((TP+FP)(TP+FN)(TN+FP)(TN+FN))</div>
         <div class="stat-mini-grid" id="extMetricsGrid"><!-- filled by JS --></div>
         <p class="stat-note" id="extMetricsNote"></p>
       </div>
 
       <div class="stat-panel">
         <h4>2. Selang Kepercayaan 95% Akurasi (Wilson Score Interval)</h4>
-        <div class="formula">CI = [p&#772;+z&sup2;/2n &plusmn; z&radic;(p&#772;(1&minus;p&#772;)/n+z&sup2;/4n&sup2;)] / (1+z&sup2;/n), z=1,96</div>
+        <button type="button" class="formula-toggle-btn">Lihat Rumus</button>
+        <div class="formula" hidden>CI = [p&#772;+z&sup2;/2n &plusmn; z&radic;(p&#772;(1&minus;p&#772;)/n+z&sup2;/4n&sup2;)] / (1+z&sup2;/n), z=1,96</div>
         <div id="ciBarWrap"></div>
         <p class="stat-note" id="ciNote"></p>
       </div>
 
       <div class="stat-panel">
         <h4>3. Uji McNemar &mdash; Simetri Kesalahan FP vs FN</h4>
-        <div class="formula">&chi;&sup2; = (|FP&minus;FN|&minus;1)&sup2; / (FP+FN), df=1, nilai kritis (&alpha;=0,05) = 3,841</div>
+        <button type="button" class="formula-toggle-btn">Lihat Rumus</button>
+        <div class="formula" hidden>&chi;&sup2; = (|FP&minus;FN|&minus;1)&sup2; / (FP+FN), df=1, nilai kritis (&alpha;=0,05) = 3,841</div>
         <div class="mcnemar-bars" id="mcnemarBars"></div>
         <p class="stat-note" id="mcnemarNote"></p>
       </div>
 
       <div class="stat-panel">
-        <h4>4. Dekomposisi Net Change vs Swap Change</h4>
-        <div class="formula">Total = Gain+Loss = |Gain&minus;Loss| + 2&middot;min(Gain,Loss) = Net + Swap</div>
+        <h4>4. Dekomposisi Koefisien Kappa: Observed vs Expected Agreement</h4>
+        <button type="button" class="formula-toggle-btn">Lihat Rumus</button>
+        <div class="formula" hidden>Po=(TP+TN)/n &middot; Pe=[(TP+FP)(TP+FN)+(FN+TN)(FP+TN)]/n&sup2; &middot; &kappa;=(Po&minus;Pe)/(1&minus;Pe)</div>
+        <div class="mcnemar-bars" id="kappaBars"></div>
+        <p class="stat-note" id="kappaNote"></p>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:28px;">Pola Perubahan Vegetasi</div>
+    <div class="stat-analysis-grid">
+      <div class="stat-panel">
+        <h4>1. Dekomposisi Perubahan Bersih vs Perubahan Berimbang (Swap)</h4>
+        <button type="button" class="formula-toggle-btn">Detail Perhitungan</button>
+        <div class="formula" hidden>Total = Gain+Loss = |Gain&minus;Loss| + 2&middot;min(Gain,Loss) = Net + Swap</div>
         <div class="swap-bar" id="swapBar"></div>
         <p class="stat-note" id="swapNote"></p>
       </div>
 
       <div class="stat-panel">
-        <h4>5. Standardisasi Z-Score Perubahan Vegetasi per Kecamatan</h4>
-        <div class="formula">z&#7522; = (x&#7522; &minus; &mu;) / &sigma;, dengan &mu; = rata-rata dan &sigma; = simpangan baku populasi (n=6 kecamatan)</div>
+        <h4>2. Perbandingan Perubahan Vegetasi Antar Kecamatan (Z-Score)</h4>
+        <button type="button" class="formula-toggle-btn">Detail Perhitungan</button>
+        <div class="formula" hidden>z&#7522; = (x&#7522; &minus; &mu;) / &sigma;, dengan &mu; = rata-rata dan &sigma; = simpangan baku populasi (n=6 kecamatan)</div>
         <div id="zScoreRows"></div>
         <p class="stat-note" id="zScoreNote"></p>
-      </div>
-
-      <div class="stat-panel">
-        <h4>6. Dekomposisi Cohen&rsquo;s Kappa: Observed vs Expected Agreement</h4>
-        <div class="formula">Po=(TP+TN)/n &middot; Pe=[(TP+FP)(TP+FN)+(FN+TN)(FP+TN)]/n&sup2; &middot; &kappa;=(Po&minus;Pe)/(1&minus;Pe)</div>
-        <div class="mcnemar-bars" id="kappaBars"></div>
-        <p class="stat-note" id="kappaNote"></p>
       </div>
     </div>
   </section>
@@ -1033,8 +972,8 @@
 <div id="chartTooltip" class="chart-tooltip"></div>
 
 <footer>
-  <span>Repository: github.com/&lt;isi-tautan-repo&gt; &middot; Laporan PDF: &lt;isi-tautan&gt;</span>
-  <span>UAS Kapita Selekta Sistem Informasi &middot; Semester 6, 2025/2026 &middot; Universitas Bakrie</span>
+  <span>Repository: <a href="https://github.com/RegaUbakrie/mataramgisweb.git" target="_blank" style="color:var(--ink-soft);">github.com/RegaUbakrie/mataramgisweb</a></span>
+  <span>Project Kapita Selekta Sistem Informasi X Maha Data | Universitas Bakrie</span>
 </footer>
 
 <script src="assets/leaflet.js"></script>
@@ -1051,11 +990,11 @@ document.querySelectorAll('.band-btn').forEach(btn=>{
 });
 
 // ---------- MAP ----------
-// ---------- THEME SWITCH: Editorial (default) vs Apple-style Clean ----------
+// ---------- THEME SWITCH: Editorial vs Ultra (default) ----------
 (function(){
   var THEME_KEY = 'mataram-ui-theme';
   var root = document.documentElement;
-  var saved = localStorage.getItem(THEME_KEY) || 'default';
+  var saved = localStorage.getItem(THEME_KEY) || 'ultra';
 
   function applyTheme(t){
     if(t && t!=='default') root.setAttribute('data-theme',t);
@@ -1104,7 +1043,7 @@ var styles = {
   gain: {color:'#8A6423', weight:0.5, fillColor:'#C99A3D', fillOpacity:0.65},
   loss: {color:'#7A311F', weight:0.5, fillColor:'#A8452E', fillOpacity:0.65}
 };
-var labels = {batas:'Batas Kota Mataram', t24:'Target Vegetasi 2024', t25:'Target Vegetasi 2025', gain:'Gain (0→1)', loss:'Loss (1→0)'};
+var labels = {batas:'Batas Kota Mataram', t24:'Vegetasi 2024', t25:'Vegetasi 2025', gain:'Penambahan Vegetasi', loss:'Kehilangan Vegetasi'};
 
 function loadLayer(key, file, defaultOn){
   fetch('data/'+file)
@@ -1163,13 +1102,18 @@ function polygonAreaHa(geometry){
   return totalM2/10000;
 }
 
-var TIER_COLOR = {tinggi:'#A8452E', sedang:'#C99A3D', rendah:'#C99A3D', terjaga:'#2F6B4F'};
-var TIER_LABEL = {tinggi:'Prioritas Tinggi', sedang:'Prioritas Sedang', rendah:'Prioritas Rendah', terjaga:'Kondisi Terjaga'};
+var TIER_COLOR = {utama:'#A8452E', tinggi:'#A8452E', sedang:'#C99A3D', dipantau:'#C99A3D', terjaga:'#2F6B4F'};
+var TIER_LABEL = {utama:'Prioritas Utama', tinggi:'Prioritas Tinggi', sedang:'Prioritas Sedang', dipantau:'Perlu Dipantau', terjaga:'Kondisi Terjaga'};
+var ACTION_TEXT = {
+  'Sekarbela': 'Prioritaskan program penghijauan dan perkuat pengawasan terhadap alih fungsi lahan di Kecamatan Sekarbela.',
+  'Sandubaya': 'Perluas program penghijauan serta tingkatkan pengawasan terhadap perubahan penggunaan lahan di Kecamatan Sandubaya.',
+  'Mataram': 'Lakukan pemantauan vegetasi secara berkala, terutama pada musim kemarau, serta evaluasi kesesuaian pemanfaatan ruang dengan RDTR Kota Mataram.',
+  'Cakranegara': 'Perkuat pemantauan pada kawasan terbangun dan ruang terbuka hijau untuk mencegah penurunan vegetasi lebih lanjut di Kecamatan Cakranegara.',
+  'Ampenan': 'Penurunan vegetasi di Kecamatan Ampenan relatif kecil. Pemantauan berkala tetap diperlukan agar kondisi tersebut tidak berkembang menjadi penurunan yang lebih besar.',
+  'Selaparang': 'Pertahankan kondisi vegetasi di Kecamatan Selaparang dan identifikasi program yang berhasil untuk dijadikan rujukan bagi kecamatan lainnya.'
+};
 function actionText(tier, name){
-  if(tier==='tinggi') return 'Percepat program penghijauan &amp; perketat izin alih fungsi lahan di '+name+'.';
-  if(tier==='sedang') return 'Pantau berkala tiap musim kemarau &amp; evaluasi RDTR di '+name+'.';
-  if(tier==='rendah') return 'Masih menyusut tipis, tapi paling ringan dibanding kecamatan lain &mdash; cukup pantau berkala agar '+name+' tidak memburuk.';
-  return 'Pertahankan capaian '+name+' &amp; jadikan acuan program penghijauan kecamatan lain.';
+  return ACTION_TEXT[name] || 'Pantau kondisi vegetasi di '+name+' secara berkala.';
 }
 
 Promise.all([
@@ -1218,7 +1162,7 @@ Promise.all([
       item.tier = 'terjaga';
     } else {
       negRank++;
-      item.tier = negRank<=2 ? 'tinggi' : (negRank<=4 ? 'sedang' : 'rendah');
+      item.tier = negRank===1 ? 'utama' : (negRank===2 ? 'tinggi' : (negRank<=4 ? 'sedang' : 'dipantau'));
     }
     item.action = actionText(item.tier, item.name);
   });
@@ -1281,7 +1225,7 @@ fetch('data/ground_truth.geojson')
       onEachFeature: function(feature, l){
         var p = feature.properties;
         l.bindTooltip(
-          '<b>Ground Truth</b><br>Kelas: '+(p.class===1?'Vegetasi':'Non-Vegetasi')+'<br>Tahun: '+p.year,
+          '<b>Ground Truth</b><br>Kelas: '+(p.class===1?'Vegetasi':'Nonvegetasi')+'<br>Tahun: '+p.year,
           {sticky:true}
         );
       }
@@ -1315,12 +1259,12 @@ document.querySelectorAll('.legend-item').forEach(item=>{
 // ---------- STATS ----------
 fetch('data/stats.json').then(r=>r.json()).then(s=>{
   var html = `
-    <div class="stat-card"><div class="v">${s.city_area_ha.toLocaleString('id-ID')} ha</div><div class="l">Luas Kota Mataram</div></div>
+    <div class="stat-card"><div class="v">${s.city_area_ha.toLocaleString('id-ID')} ha</div><div class="l">Luas Wilayah Kota Mataram</div></div>
     <div class="stat-card"><div class="v">${s.pct_2024}%</div><div class="l">Vegetasi 2024</div></div>
     <div class="stat-card"><div class="v">${s.pct_2025}%</div><div class="l">Vegetasi 2025</div></div>
-    <div class="stat-card"><div class="v loss-v">${s.pct_change_vs_2024}%</div><div class="l">Perubahan vs 2024</div></div>
-    <div class="stat-card"><div class="v" style="color:#C99A3D">+${s.gain_ha} ha</div><div class="l">Gain</div></div>
-    <div class="stat-card"><div class="v loss-v">-${s.loss_ha} ha</div><div class="l">Loss</div></div>
+    <div class="stat-card"><div class="v loss-v">${s.pct_change_vs_2024}%</div><div class="l">Perubahan Luas Vegetasi</div></div>
+    <div class="stat-card"><div class="v" style="color:#C99A3D">+${s.gain_ha} ha</div><div class="l">Penambahan Vegetasi</div></div>
+    <div class="stat-card"><div class="v loss-v">-${s.loss_ha} ha</div><div class="l">Kehilangan Vegetasi</div></div>
   `;
   document.getElementById('statsRow').innerHTML = html;
 
@@ -1359,10 +1303,10 @@ fetch('data/stats.json').then(r=>r.json()).then(s=>{
   });
 
   document.getElementById('statsRow2').innerHTML = `
-    <div class="stat-card"><div class="v">${s.target_2024_ha.toLocaleString('id-ID')} ha</div><div class="l">Luas Target 2024</div></div>
-    <div class="stat-card"><div class="v">${s.target_2025_ha.toLocaleString('id-ID')} ha</div><div class="l">Luas Target 2025</div></div>
-    <div class="stat-card"><div class="v loss-v">${s.net_change_ha.toLocaleString('id-ID')} ha</div><div class="l">Net Change</div></div>
-    <div class="stat-card"><div class="v loss-v">${s.pct_change_vs_2024}%</div><div class="l">% Perubahan thd 2024</div></div>
+    <div class="stat-card"><div class="v">${s.target_2024_ha.toLocaleString('id-ID')} ha</div><div class="l">Luas Vegetasi 2024</div></div>
+    <div class="stat-card"><div class="v">${s.target_2025_ha.toLocaleString('id-ID')} ha</div><div class="l">Luas Vegetasi 2025</div></div>
+    <div class="stat-card"><div class="v loss-v">${s.net_change_ha.toLocaleString('id-ID')} ha</div><div class="l">Perubahan Bersih</div></div>
+    <div class="stat-card"><div class="v loss-v">${s.pct_change_vs_2024}%</div><div class="l">% Perubahan Bersih</div></div>
   `;
 });
 
@@ -1435,6 +1379,16 @@ document.getElementById('codeResetBtn').addEventListener('click',()=>{
   renderCode();
 });
 
+// ---------- ANALISIS LANJUTAN: toggle tampilkan/sembunyikan rumus ----------
+document.querySelectorAll('.formula-toggle-btn').forEach(function(btn){
+  var formula = btn.nextElementSibling;
+  btn.addEventListener('click', function(){
+    var isHidden = formula.hasAttribute('hidden');
+    if(isHidden){ formula.removeAttribute('hidden'); btn.textContent = btn.textContent.replace('Lihat Rumus','Sembunyikan Rumus').replace('Detail Perhitungan','Sembunyikan Detail'); }
+    else { formula.setAttribute('hidden',''); btn.textContent = btn.textContent.replace('Sembunyikan Rumus','Lihat Rumus').replace('Sembunyikan Detail','Detail Perhitungan'); }
+  });
+});
+
 // ---------- KECAMATAN BAR CHART (gain vs loss ha) ----------
 fetch('data/kecamatan_summary.json').then(r=>r.json()).then(data=>{
   var entries = Object.entries(data).map(([k,v])=>[k, v.gain||0, v.loss||0]).sort((a,b)=>b[2]-a[2]);
@@ -1443,12 +1397,12 @@ fetch('data/kecamatan_summary.json').then(r=>r.json()).then(data=>{
     <div style="margin-bottom:10px;">
       <div style="font-size:12.5px;font-weight:600;margin-bottom:4px;">${name}</div>
       <div class="bar-row" style="grid-template-columns:60px 1fr 60px;">
-        <div style="color:var(--gain);font-size:11px;">Gain</div>
+        <div style="color:var(--gain);font-size:11px;">Penambahan</div>
         <div class="bar-track"><div class="bar-fill" style="background:var(--gain);width:${(gain/max*100).toFixed(1)}%"></div></div>
         <div class="val">${gain.toFixed(1)} ha</div>
       </div>
       <div class="bar-row" style="grid-template-columns:60px 1fr 60px;">
-        <div style="color:var(--loss);font-size:11px;">Loss</div>
+        <div style="color:var(--loss);font-size:11px;">Kehilangan</div>
         <div class="bar-track"><div class="bar-fill" style="width:${(loss/max*100).toFixed(1)}%"></div></div>
         <div class="val">${loss.toFixed(1)} ha</div>
       </div>
