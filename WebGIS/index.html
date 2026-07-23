@@ -758,19 +758,19 @@
           <div class="dc-name">Confusion_Matrix.csv</div>
           <div class="dc-desc">Confusion matrix hasil evaluasi model klasifikasi (TN, FP, FN, TP) beserta metrik Akurasi, Precision, Recall, F1-Score, dan Koefisien Kappa &mdash; sumber angka pada Tab 03.</div>
           <div class="dc-meta">CSV &middot; &asymp;1 KB</div>
-          <a class="download-btn" href="data/raw/Confusion_Matrix.csv" download>&darr; Unduh</a>
+          <a class="download-btn" href="data/confusion_matrix.csv" download>&darr; Unduh</a>
         </div>
         <div class="download-card" style="border-color:#9FC7A8;">
           <div class="dc-name">Summary_Statistik_Mataram_2024_2025.csv</div>
           <div class="dc-desc">Ringkasan luas vegetasi 2024/2025, penambahan/kehilangan vegetasi, perubahan bersih, dan akurasi model &mdash; sumber angka pada Tab 01 &amp; 04.</div>
           <div class="dc-meta">CSV &middot; &asymp;1 KB</div>
-          <a class="download-btn" href="data/raw/Summary_Statistik_Mataram_2024_2025.csv" download>&darr; Unduh</a>
+          <a class="download-btn" href="data/Summary_Statistik_Mataram_2024_2025.csv" download>&darr; Unduh</a>
         </div>
         <div class="download-card" style="border-color:#9FC7A8;">
           <div class="dc-name">ground_truth_mataram_2024_2025.csv</div>
           <div class="dc-desc">640 titik ground truth (longitude, latitude, kelas, tahun) sebelum dikonversi ke format GeoJSON.</div>
           <div class="dc-meta">CSV &middot; &asymp;28 KB</div>
-          <a class="download-btn" href="data/raw/ground_truth_mataram_2024_2025.csv" download>&darr; Unduh</a>
+          <a class="download-btn" href="data/ground_truth_mataram_2024_2025.csv" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">batas_kota.geojson</div>
@@ -1022,6 +1022,50 @@
 <!-- Leaflet Control Scale CSS & JS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-control-scale@1.0.0/L.Control.Scale.css"/>
 <script src="https://cdn.jsdelivr.net/npm/leaflet-control-scale@1.0.0/L.Control.Scale.js"></script>
+
+<!-- Download Handler Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Add click handlers to all download buttons
+  const downloadButtons = document.querySelectorAll('.download-btn');
+  
+  downloadButtons.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (!href) return;
+      
+      // For local files, ensure proper path handling
+      fetch(href, { method: 'HEAD' })
+        .then(response => {
+          if (response.ok) {
+            // File exists, proceed with normal download
+            const link = document.createElement('a');
+            link.href = href;
+            link.download = href.split('/').pop() || 'download';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } else {
+            alert('File tidak ditemukan: ' + href);
+            console.error('404 - File not found:', href);
+          }
+        })
+        .catch(error => {
+          // Fallback: try direct download anyway
+          const link = document.createElement('a');
+          link.href = href;
+          link.download = href.split('/').pop() || 'download';
+          link.target = '_blank';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+    });
+  });
+  
+  console.log('✓ Download handler initialized for', downloadButtons.length, 'buttons');
+});
+</script>
 
 <!-- Leaflet Coordinates Display -->
 <style>

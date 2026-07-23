@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Perubahan Vegetasi Kota Mataram 2024–2025 · WebGIS</title>
 <script>try{var __t=localStorage.getItem('mataram-ui-theme')||'ultra';if(__t!=='default'){document.documentElement.setAttribute('data-theme',__t);}}catch(e){}</script>
-<link rel="stylesheet" href="assets/leaflet.css" />
+<link rel="stylesheet" href="WebGIS/assets/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
 <style>
@@ -198,6 +198,7 @@
   .code-viewer{
     max-height:480px;overflow-y:auto;overflow-x:auto;font-family:'IBM Plex Mono',monospace;
     font-size:12.5px;line-height:1.65;background:#1E2620;
+    scroll-behavior: smooth;
   }
   .code-loading{padding:20px;color:#9FB3A6;}
   .codeline{display:flex;white-space:pre;padding:0 16px;transition:background .2s, opacity .2s;opacity:0.38;}
@@ -206,9 +207,50 @@
   }
   .codeline .code-text{color:#DCE3DA;}
   .codeline.in-range{opacity:1;}
-  .codeline.in-range.range-start{border-top:1px solid #C99A3D;}
+  .codeline.in-range.range-start{
+    border-top:1px solid #C99A3D;
+    animation: slideInHighlight 0.4s ease-out;
+  }
   .codeline.in-range.range-end{border-bottom:1px solid #C99A3D;}
-  .codeline.in-range{background:rgba(201,154,61,0.08);}
+  .codeline.in-range{
+    background:rgba(201,154,61,0.08);
+    animation: fadeInLines 0.35s ease-out forwards;
+  }
+  .codeline.in-range.range-start{
+    background:rgba(201,154,61,0.18);
+    box-shadow: inset 0 0 8px rgba(201,154,61,0.3);
+    animation: slideInHighlight 0.4s ease-out, pulseGlow 2s ease-in-out infinite;
+  }
+  @keyframes slideInHighlight {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+      background: rgba(201,154,61,0.25);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+      background: rgba(201,154,61,0.08);
+    }
+  }
+  @keyframes fadeInLines {
+    from {
+      opacity: 0.5;
+      background: rgba(201,154,61,0.12);
+    }
+    to {
+      opacity: 1;
+      background: rgba(201,154,61,0.08);
+    }
+  }
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: inset 0 0 8px rgba(201,154,61,0.3), 0 0 4px rgba(201,154,61,0.2);
+    }
+    50% {
+      box-shadow: inset 0 0 12px rgba(201,154,61,0.5), 0 0 8px rgba(201,154,61,0.4);
+    }
+  }
   .tok-comment{color:#6E8A76;}
   .tok-string{color:#C99A3D;}
   .tok-keyword{color:#8BB89A;}
@@ -567,7 +609,7 @@
 
 <header class="top">
   <div class="brand-block">
-    <img src="assets/logo-mataram.png" alt="Lambang Kota Mataram" class="brand-logo">
+    <img src="WebGIS/assets/logo-mataram.png" alt="Lambang Kota Mataram" class="brand-logo">
     <div>
       <div class="brand-eyebrow"><span class="dot"></span>KAPITA SELEKTA SISTEM INFORMASI &middot; MAHA DATA</div>
       <h1>Pemetaan Perubahan <em>Vegetasi</em> Kota Mataram</h1>
@@ -716,79 +758,79 @@
           <div class="dc-name">Confusion_Matrix.csv</div>
           <div class="dc-desc">Confusion matrix hasil evaluasi model klasifikasi (TN, FP, FN, TP) beserta metrik Akurasi, Precision, Recall, F1-Score, dan Koefisien Kappa &mdash; sumber angka pada Tab 03.</div>
           <div class="dc-meta">CSV &middot; &asymp;1 KB</div>
-          <a class="download-btn" href="data/raw/Confusion_Matrix.csv" download>&darr; Unduh</a>
+          <a class="download-btn" href="WebGIS/data/confusion_matrix.csv" download>&darr; Unduh</a>
         </div>
         <div class="download-card" style="border-color:#9FC7A8;">
           <div class="dc-name">Summary_Statistik_Mataram_2024_2025.csv</div>
           <div class="dc-desc">Ringkasan luas vegetasi 2024/2025, penambahan/kehilangan vegetasi, perubahan bersih, dan akurasi model &mdash; sumber angka pada Tab 01 &amp; 04.</div>
           <div class="dc-meta">CSV &middot; &asymp;1 KB</div>
-          <a class="download-btn" href="data/raw/Summary_Statistik_Mataram_2024_2025.csv" download>&darr; Unduh</a>
+          <a class="download-btn" href="WebGIS/data/Summary_Statistik_Mataram_2024_2025.csv" download>&darr; Unduh</a>
         </div>
         <div class="download-card" style="border-color:#9FC7A8;">
           <div class="dc-name">ground_truth_mataram_2024_2025.csv</div>
           <div class="dc-desc">640 titik ground truth (longitude, latitude, kelas, tahun) sebelum dikonversi ke format GeoJSON.</div>
           <div class="dc-meta">CSV &middot; &asymp;28 KB</div>
-          <a class="download-btn" href="data/raw/ground_truth_mataram_2024_2025.csv" download>&darr; Unduh</a>
+          <a class="download-btn" href="WebGIS/data/ground_truth_mataram_2024_2025.csv" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">batas_kota.geojson</div>
           <div class="dc-desc">Batas administrasi Kota Mataram (shapefile GADM level-4).</div>
           <div class="dc-meta">GeoJSON &middot; &asymp;56 KB</div>
-          <a class="download-btn" href="data/batas_kota.geojson" download>&darr; Unduh</a>
+          <a class="download-btn" href="WebGIS/data/batas_kota.geojson" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">kecamatan.geojson</div>
           <div class="dc-desc">Batas 6 kecamatan Kota Mataram, dipakai untuk agregasi gain/loss.</div>
           <div class="dc-meta">GeoJSON &middot; &asymp;145 KB</div>
-          <a class="download-btn" href="data/kecamatan.geojson" download>&darr; Unduh</a>
+          <a class="download-btn" href="WebGIS/data/kecamatan.geojson" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">kecamatan_summary.json</div>
           <div class="dc-desc">Ringkasan penambahan dan kehilangan vegetasi (ha) per kecamatan, sumber panel Prioritas Penanganan.</div>
           <div class="dc-meta">JSON &middot; &asymp;1 KB</div>
-          <a class="download-btn" href="data/kecamatan_summary.json" download>&darr; Unduh</a>
+          <a class="download-btn" href="WebGIS/data/kecamatan_summary.json" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">target_2024.geojson</div>
           <div class="dc-desc">Poligon tutupan vegetasi hasil klasifikasi tahun 2024 (satuan pemetaan minimum &plusmn;0,2 ha).</div>
           <div class="dc-meta">GeoJSON &middot; &asymp;751 KB</div>
-          <a class="download-btn" href="data/target_2024.geojson" download>&darr; Unduh</a>
+          <a class="download-btn" href="WebGIS/data/target_2024.geojson" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">target_2025.geojson</div>
           <div class="dc-desc">Poligon tutupan vegetasi hasil klasifikasi tahun 2025, dengan metode yang sama seperti tahun 2024.</div>
           <div class="dc-meta">GeoJSON &middot; &asymp;736 KB</div>
-          <a class="download-btn" href="data/target_2025.geojson" download>&darr; Unduh</a>
+          <a class="download-btn" href="WebGIS/data/target_2025.geojson" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">gain.geojson</div>
           <div class="dc-desc">Poligon area yang berubah dari nonvegetasi menjadi vegetasi antara tahun 2024&ndash;2025.</div>
           <div class="dc-meta">GeoJSON &middot; &asymp;806 KB</div>
-          <a class="download-btn" href="data/gain.geojson" download>&darr; Unduh</a>
+          <a class="download-btn" href="WebGIS/data/gain.geojson" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">loss.geojson</div>
           <div class="dc-desc">Poligon area yang berubah dari vegetasi menjadi nonvegetasi antara tahun 2024&ndash;2025.</div>
           <div class="dc-meta">GeoJSON &middot; &asymp;1,07 MB</div>
-          <a class="download-btn" href="data/loss.geojson" download>&darr; Unduh</a>
+          <a class="download-btn" href="WebGIS/data/loss.geojson" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">ground_truth.geojson</div>
           <div class="dc-desc">640 titik ground truth (training + testing), kelas 0/1 &times; tahun 2024/2025.</div>
           <div class="dc-meta">GeoJSON &middot; &asymp;94 KB</div>
-          <a class="download-btn" href="data/ground_truth.geojson" download>&darr; Unduh</a>
+          <a class="download-btn" href="WebGIS/data/ground_truth.geojson" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">stats.json</div>
           <div class="dc-desc">Statistik ringkasan kota: luas wilayah, persentase vegetasi, penambahan/kehilangan vegetasi, confusion matrix, dan metrik evaluasi model.</div>
           <div class="dc-meta">JSON &middot; &asymp;1 KB</div>
-          <a class="download-btn" href="data/stats.json" download>&darr; Unduh</a>
+          <a class="download-btn" href="WebGIS/data/stats.json" download>&darr; Unduh</a>
         </div>
         <div class="download-card">
           <div class="dc-name">main_script.js</div>
           <div class="dc-desc">Skrip lengkap Google Earth Engine yang digunakan untuk seluruh tahapan analisis, dari praproses hingga ekspor data, sesuai yang ditampilkan pada panel kode di atas.</div>
           <div class="dc-meta">JavaScript &middot; &asymp;25 KB</div>
-          <a class="download-btn" href="assets/main_script.js" download>&darr; Unduh</a>
+          <a class="download-btn" href="WebGIS/assets/main_script.js" download>&darr; Unduh</a>
         </div>
       </div>
     </div>
@@ -976,10 +1018,54 @@
   <span>Project Kapita Selekta Sistem Informasi X Maha Data | Universitas Bakrie</span>
 </footer>
 
-<script src="assets/leaflet.js"></script>
+<script src="WebGIS/assets/leaflet.js"></script>
 <!-- Leaflet Control Scale CSS & JS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-control-scale@1.0.0/L.Control.Scale.css"/>
 <script src="https://cdn.jsdelivr.net/npm/leaflet-control-scale@1.0.0/L.Control.Scale.js"></script>
+
+<!-- Download Handler Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Add click handlers to all download buttons
+  const downloadButtons = document.querySelectorAll('.download-btn');
+  
+  downloadButtons.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (!href) return;
+      
+      // For local files, ensure proper path handling
+      fetch(href, { method: 'HEAD' })
+        .then(response => {
+          if (response.ok) {
+            // File exists, proceed with normal download
+            const link = document.createElement('a');
+            link.href = href;
+            link.download = href.split('/').pop() || 'download';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } else {
+            alert('File tidak ditemukan: ' + href);
+            console.error('404 - File not found:', href);
+          }
+        })
+        .catch(error => {
+          // Fallback: try direct download anyway
+          const link = document.createElement('a');
+          link.href = href;
+          link.download = href.split('/').pop() || 'download';
+          link.target = '_blank';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+    });
+  });
+  
+  console.log('✓ Download handler initialized for', downloadButtons.length, 'buttons');
+});
+</script>
 
 <!-- Leaflet Coordinates Display -->
 <style>
@@ -1622,7 +1708,16 @@ document.querySelectorAll('.flow-step.clickable').forEach(step=>{
     document.getElementById('codePanelTitle').textContent = 'gee_script.js — baris '+start+'–'+end+' ('+step.textContent.replace(/\s+/g,' ').trim()+')';
     setTimeout(()=>{
       var target = document.getElementById('ln-'+start);
-      if(target) target.scrollIntoView({block:'center', behavior:'smooth'});
+      if(target) {
+        var codeViewer = document.getElementById('codeViewer');
+        // Smooth scroll with additional animation
+        target.scrollIntoView({block:'center', behavior:'smooth'});
+        // Add pulse effect to target line
+        target.style.animation = 'none';
+        setTimeout(() => {
+          target.style.animation = 'pulseGlow 2s ease-in-out infinite';
+        }, 10);
+      }
     }, 60);
   });
 });
