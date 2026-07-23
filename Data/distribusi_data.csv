@@ -1,0 +1,8 @@
+Kategori,Jumlah_Titik
+Vegetasi 2024,160
+Nonvegetasi 2024,160
+Vegetasi 2025,160
+Nonvegetasi 2025,160
+Total Ground Truth,640
+Training (70%),427
+Testing (30%),213
